@@ -29,7 +29,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateUser = async (newData: Partial<User>) => {
-    // Mescla os dados antigos com os novos informados (como nome, foto, peso, etc.)
     const updatedUser = { ...user, ...newData } as User;
     setUser(updatedUser);
     await StorageService.setItem(StorageKeys.USER, updatedUser);

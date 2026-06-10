@@ -8,10 +8,9 @@ import {
   KeyboardAvoidingView, 
   Platform 
 } from 'react-native';
-import { UserContext } from '../contexts/UserContext';
+import { UserContext } from '../contexts/UserContext.js';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
-// Tipagem para a navegação (temporária até configurarmos o React Navigation)
 interface Props {
   navigation: any; 
 }
@@ -48,11 +47,9 @@ const LoginScreen = ({ navigation }: Props) => {
 
     setError('');
     
-    // Atualiza o estado global e salva no AsyncStorage simultaneamente
     await updateUser({ idade, peso, altura });
     await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
     
-    // Navega para a tela principal
     navigation.navigate('MainTabs');
   };
 
@@ -114,7 +111,7 @@ const LoginScreen = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6', // Cinza muito claro de fundo
+    backgroundColor: '#F4F7F6',
     justifyContent: 'center',
     padding: 20,
   },
@@ -160,7 +157,7 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
   },
   button: {
-    backgroundColor: '#27AE60', // Verde vibrante e profissional
+    backgroundColor: '#27AE60', 
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
