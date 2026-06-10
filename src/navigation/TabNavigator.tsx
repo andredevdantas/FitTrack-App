@@ -7,6 +7,7 @@ import telaPrincipal from '../screens/telaPrincipal';
 import telaMedalhas from '../screens/telaMedalhas';
 import telaMissoes from '../screens/telaMissoes';
 import telaPerfil from '../screens/telaPerfil';
+import { styles, tabBarColors } from '../styles/navigation/TabNavigatorStyles';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -16,21 +17,9 @@ export default function TabNavigator() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#27AE60',
-        tabBarInactiveTintColor: '#A0A0A0',
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#E5E8E8',
-          height: 65,
-          paddingBottom: 10,
-          paddingTop: 10,
-          elevation: 5,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-        },
+        tabBarActiveTintColor: tabBarColors.active,
+        tabBarInactiveTintColor: tabBarColors.inactive,
+        tabBarStyle: styles.tabBar,
         tabBarIcon: ({ color }) => {
           let iconName = '';
 

@@ -1,4 +1,3 @@
-// src/contexts/UserContext.tsx
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 import { User } from '../types';

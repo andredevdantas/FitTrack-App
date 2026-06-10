@@ -3,26 +3,27 @@
 FitTrack é um aplicativo de saúde e bem-estar projetado para ajudar os usuários a manterem a consistência em seus treinos. O app utiliza gamificação (missões diárias e medalhas) e monitoramento semanal para incentivar a prática regular de exercícios.
 
 ## 🚀 Tecnologias e Arquitetura (Versão 2.0)
-Atualmente estou trabalhando em uma refatoração completa nesse projeto para adotar os padrões modernos e profissionais da indústria:
+Atualmente estou trabalhando em uma atualização completa nesse projeto para adotar os padrões modernos e profissionais da indústria:
 
 - **React Native & Expo (SDK 54)** - Framework principal.
 - **TypeScript** - Tipagem estática rigorosa para maior segurança e previsibilidade do código.
 - **React Navigation** - Navegação fluida utilizando Native Stack e Bottom Tabs.
 - **Context API** - Gerenciamento de estado global descentralizado e limpo (sem Redux).
 - **AsyncStorage** - Persistência de dados locais (offline-first).
-- **Arquitetura Modular (SOLID)** - Separação clara de responsabilidades (Storage, Contexts, Screens, Types).
+- **Arquitetura Modular (SOLID)** - Separação clara de responsabilidades (Storage, Contexts, Screens, Styles, Types).
 
 ## 📂 Estrutura do Projeto
-```text
+```
 src/
 ├── assets/         # Imagens, ícones e fontes da aplicação
 ├── components/     # Componentes de UI reutilizáveis (Cards, Buttons, etc)
 ├── contexts/       # Gerenciamento de Estado Global
 ├── hooks/          # Hooks customizados para lógica encapsulada
 ├── navigation/     # Configuração de rotas da aplicação
-├── screens/        # Telas e fluxos de navegação
+├── screens/        # Telas da aplicação (focadas apenas na lógica e renderização)
 ├── services/       # Lógicas de negócio e chamadas externas
 ├── storage/        # Implementação centralizada do AsyncStorage
+├── styles/         # Arquivos de estilização isolados por escopo (StyleSheet)
 ├── types/          # Definições de interfaces do TypeScript
 └── utils/          # Funções utilitárias e formatações
 ```
@@ -30,20 +31,20 @@ src/
 ## 💻 Como rodar o projeto localmente
 
 1. Clone este repositório:
-```bash
+```
    git clone [https://github.com/andredevdantas/FitTrack-App.git]
    ```
    
 2. Certifique-se de ter o Node.js instalado.
    
 3. Instale as dependências executando:
-```bash
+```
    npm install
 ```
 
 4. Inicie o servidor do Expo:
 
-```bash
+```
    npx expo start
 ```
     
