@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MainTabParamList } from '../types';
 
 import telaPrincipal from '../screens/telaPrincipal';
@@ -12,6 +13,7 @@ import { styles, tabBarColors } from '../styles/navigation/TabNavigatorStyles';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function TabNavigator() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -19,7 +21,13 @@ export default function TabNavigator() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: tabBarColors.active,
         tabBarInactiveTintColor: tabBarColors.inactive,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: 65 + insets.bottom,
+            paddingBottom: 10 + insets.bottom,
+          }
+        ],
         tabBarIcon: ({ color }) => {
           let iconName = '';
 
