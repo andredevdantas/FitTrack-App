@@ -8,14 +8,14 @@ import {
   KeyboardAvoidingView, 
   Platform 
 } from 'react-native';
-import { UserContext } from '../contexts/UserContext.js';
+import { UserContext } from '../contexts/UserContext';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
 interface Props {
   navigation: any; 
 }
 
-const LoginScreen = ({ navigation }: Props) => {
+const telaLogin = ({ navigation }: Props) => {
   const { updateUser } = useContext(UserContext);
   
   const [idade, setIdade] = useState('');
@@ -176,4 +176,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default telaLogin;

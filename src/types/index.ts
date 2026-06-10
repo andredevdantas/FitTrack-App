@@ -25,3 +25,15 @@ export interface DaysOfWeek {
   quinta: boolean;
   sexta: boolean;
 }
+
+export type RootStackParamList = {
+  Login: undefined;
+  MainTabs: undefined;
+};
+
+export type MainTabParamList = {
+  Principal: undefined;
+  Medalhas: undefined;
+  Missoes: undefined;
+  Perfil: undefined;
+};
