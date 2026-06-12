@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   title: {
     fontSize: 28,
@@ -59,9 +59,13 @@ export const styles = StyleSheet.create({
     backgroundColor: '#27AE60',
     borderRadius: 6,
   },
+  list: {
+    flex: 1,
+  },
   listContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingTop: 8,
+    paddingBottom: 24,
   },
   missionCard: {
     backgroundColor: '#FFFFFF',
@@ -122,8 +126,17 @@ export const styles = StyleSheet.create({
     borderColor: '#27AE60',
   },
   actionsContainer: {
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingBottom: 30,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 10,
   },
   actionButton: {
     flexDirection: 'row',
@@ -158,15 +171,9 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  timerText: {
-    textAlign: 'center',
-    fontSize: 14,
-    color: '#7F8C8D',
-    fontWeight: '600',
-  },
   deactivateAdminButton: {
     backgroundColor: 'transparent',
-    paddingVertical: 10,
+    paddingVertical: 4,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -175,5 +182,11 @@ export const styles = StyleSheet.create({
     color: '#7F8C8D',
     fontSize: 14,
     textDecorationLine: 'underline',
+  },
+  timerText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#7F8C8D',
+    fontWeight: '600',
   },
 });

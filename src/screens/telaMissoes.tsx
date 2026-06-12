@@ -217,6 +217,7 @@ const TelaMissoes = () => {
       </View>
 
       <FlatList
+        style={styles.list}
         data={missions}
         keyExtractor={(item) => item.id}
         renderItem={renderMissionCard}
