@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator, Touch
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutService, DailyMission } from '../services/WorkoutService';
 import { styles } from '../styles/screens/telaMissoesStyles';
+import { StorageService, StorageKeys } from '../storage/StorageService';
 
 const TelaMissoes = () => {
   const [missions, setMissions] = useState<DailyMission[]>([]);
@@ -14,12 +15,29 @@ const TelaMissoes = () => {
   const [secretTapCount, setSecretTapCount] = useState<number>(0);
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
 
-  const loadMissions = useCallback(async () => {
+  const getTargetResetTimestamp = (baseDate: Date) => {
+    const target = new Date(baseDate);
+    target.setHours(4, 0, 0, 0);
+    if (baseDate.getHours() >= 4) {
+      target.setDate(target.getDate() + 1);
+    }
+    return target.getTime();
+  };
+
+  const loadNewMissionsCycle = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await WorkoutService.fetchDailyMissions();
+      const nextResetTs = getTargetResetTimestamp(new Date());
+
       setMissions(data);
       setCompletedIds([]);
+      setRerollsLeft(2);
+
+      await StorageService.setItem(StorageKeys.MISSOES_LIST, data);
+      await StorageService.setItem(StorageKeys.MISSOES_COMPLETED, []);
+      await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 2);
+      await StorageService.setItem(StorageKeys.MISSOES_LAST_DATE, nextResetTs);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar as missões diárias.');
     } finally {
@@ -27,31 +45,51 @@ const TelaMissoes = () => {
     }
   }, []);
 
-  useEffect(() => {
-    loadMissions();
-  }, [loadMissions]);
+  const checkPersistence = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const nowTs = new Date().getTime();
+      const savedResetTs = await StorageService.getItem<number>(StorageKeys.MISSOES_LAST_DATE);
 
-  useEffect(() => {
-    const calculateTimeRemaining = () => {
-      const now = new Date();
-      const nextReset = new Date(now);
-      nextReset.setHours(4, 0, 0, 0);
+      if (savedResetTs && nowTs < savedResetTs) {
+        const savedMissions = await StorageService.getItem<DailyMission[]>(StorageKeys.MISSOES_LIST);
+        const savedCompleted = await StorageService.getItem<string[]>(StorageKeys.MISSOES_COMPLETED);
+        const savedRerolls = await StorageService.getItem<number>(StorageKeys.MISSOES_REROLLS);
 
-      if (now.getHours() >= 4) {
-        nextReset.setDate(nextReset.getDate() + 1);
+        if (savedMissions) {
+          setMissions(savedMissions);
+          setCompletedIds(savedCompleted || []);
+          setRerollsLeft(savedRerolls !== null ? savedRerolls : 2);
+          setIsLoading(false);
+          return;
+        }
       }
+      
+      await loadNewMissionsCycle();
+    } catch (error) {
+      await loadNewMissionsCycle();
+    }
+  }, [loadNewMissionsCycle]);
 
-      return nextReset.getTime() - now.getTime();
-    };
+  useEffect(() => {
+    checkPersistence();
+  }, [checkPersistence]);
 
-    setResetTime(calculateTimeRemaining());
-
+  useEffect(() => {
     const interval = setInterval(() => {
-      setResetTime(calculateTimeRemaining());
+      const now = new Date();
+      const targetTs = getTargetResetTimestamp(now);
+      const diff = targetTs - now.getTime();
+      
+      if (diff <= 0) {
+        checkPersistence();
+      } else {
+        setResetTime(diff);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [checkPersistence]);
 
   const handleTitlePress = () => {
     if (isAdminMode) return;
@@ -85,10 +123,11 @@ const TelaMissoes = () => {
     );
   };
 
-  const handleMissionComplete = (id: string) => {
+  const handleMissionComplete = async (id: string) => {
     if (!completedIds.includes(id)) {
       const newCompleted = [...completedIds, id];
       setCompletedIds(newCompleted);
+      await StorageService.setItem(StorageKeys.MISSOES_COMPLETED, newCompleted);
 
       if (newCompleted.length === 5) {
         Alert.alert(
@@ -96,6 +135,7 @@ const TelaMissoes = () => {
           'Completou todas as missões do dia! As missões serão reiniciadas às 04:00 da manhã.'
         );
         setRerollsLeft(0);
+        await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 0);
       }
     }
   };
@@ -109,9 +149,22 @@ const TelaMissoes = () => {
           { text: 'Cancelar', style: 'cancel' },
           { 
             text: 'Trocar', 
-            onPress: () => {
-              loadMissions();
-              setRerollsLeft(prev => prev - 1);
+            onPress: async () => {
+              try {
+                setIsLoading(true);
+                const data = await WorkoutService.fetchDailyMissions();
+                const newRerolls = rerollsLeft - 1;
+                
+                setMissions(data);
+                setRerollsLeft(newRerolls);
+                
+                await StorageService.setItem(StorageKeys.MISSOES_LIST, data);
+                await StorageService.setItem(StorageKeys.MISSOES_REROLLS, newRerolls);
+              } catch {
+                Alert.alert('Erro', 'Não foi possível trocar as missões.');
+              } finally {
+                setIsLoading(false);
+              }
             } 
           }
         ]
@@ -135,8 +188,7 @@ const TelaMissoes = () => {
           text: 'Resetar', 
           style: 'destructive',
           onPress: () => {
-            loadMissions();
-            setRerollsLeft(2);
+            loadNewMissionsCycle();
           } 
         }
       ]

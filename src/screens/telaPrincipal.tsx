@@ -5,6 +5,7 @@ import { DaysContext } from '../contexts/DaysContext';
 import { DaysOfWeek } from '../types';
 import { styles } from '../styles/screens/telaPrincipalStyles';
 import { WorkoutService, Exercise } from '../services/WorkoutService';
+import { StorageService, StorageKeys } from '../storage/StorageService';
 
 const TelaPrincipal = () => {
   const { selectedDays } = useContext(DaysContext);
@@ -24,14 +25,31 @@ const TelaPrincipal = () => {
     };
     setCurrentDay(daysMap[dayIndex] || null);
 
-    loadWorkouts();
+    initData();
   }, []);
 
-  const loadWorkouts = async () => {
+  const initData = async () => {
     try {
       setIsLoading(true);
       const data = await WorkoutService.fetchWeeklyPlan();
+      
       setWorkoutPlan(data);
+
+      const todayStr = new Date().toDateString();
+      const savedDate = await StorageService.getItem<string>(StorageKeys.PRINCIPAL_LAST_DATE);
+      
+      if (savedDate === todayStr) {
+        const savedCompletion = await StorageService.getItem<Partial<Record<keyof DaysOfWeek, boolean>>>(
+          StorageKeys.PRINCIPAL_COMPLETION
+        );
+        if (savedCompletion) {
+          setCompletionStatus(savedCompletion);
+        }
+      } else {
+        await StorageService.setItem(StorageKeys.PRINCIPAL_LAST_DATE, todayStr);
+        await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, {});
+        setCompletionStatus({});
+      }
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os treinos.');
     } finally {
@@ -45,7 +63,7 @@ const TelaPrincipal = () => {
     );
   }, [selectedDays]);
 
-  const handleCompleteWorkout = useCallback((day: keyof DaysOfWeek) => {
+  const handleCompleteWorkout = useCallback(async (day: keyof DaysOfWeek) => {
     if (day !== currentDay) {
       Alert.alert('Ação não permitida', 'Apenas pode marcar como concluído o treino do dia atual.');
       return;
@@ -56,7 +74,10 @@ const TelaPrincipal = () => {
       return;
     }
 
-    setCompletionStatus((prev) => ({ ...prev, [day]: true }));
+    const updatedStatus = { ...completionStatus, [day]: true };
+    setCompletionStatus(updatedStatus);
+    await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
+    
     Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso.`);
   }, [currentDay, completionStatus]);
 
@@ -137,6 +158,7 @@ const TelaPrincipal = () => {
       </View>
 
       <FlatList
+        style={styles.list}
         data={activeWorkouts}
         keyExtractor={(item) => item}
         renderItem={renderWorkoutCard}

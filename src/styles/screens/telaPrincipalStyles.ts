@@ -35,6 +35,9 @@ export const styles = StyleSheet.create({
     color: '#7F8C8D',
     marginTop: 4,
   },
+  list: {
+    flex: 1,
+  },
   listContainer: {
     paddingHorizontal: 16,
     paddingBottom: 30,

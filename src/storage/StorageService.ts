@@ -7,6 +7,12 @@ export const StorageKeys = {
   MISSIONS: '@FitTrack:missions',
   MISSIONS_DATE: '@FitTrack:missionsDate',
   MEDALS: '@FitTrack:medals',
+  PRINCIPAL_COMPLETION: '@FitTrack:principalCompletion',
+  PRINCIPAL_LAST_DATE: '@FitTrack:principalLastDate',
+  MISSOES_LIST: '@FitTrack:missoesList',
+  MISSOES_COMPLETED: '@FitTrack:missoesCompleted',
+  MISSOES_REROLLS: '@FitTrack:missoesRerolls',
+  MISSOES_LAST_DATE: '@FitTrack:missoesLastDate',
 };
 
 export const StorageService = {
