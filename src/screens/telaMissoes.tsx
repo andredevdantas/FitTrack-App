@@ -10,6 +10,7 @@ const TelaMissoes = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [rerollsLeft, setRerollsLeft] = useState<number>(2);
   const [resetTime, setResetTime] = useState<number>(0);
+  
   const [secretTapCount, setSecretTapCount] = useState<number>(0);
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
 
@@ -63,6 +64,12 @@ const TelaMissoes = () => {
       }
       return newCount;
     });
+  };
+
+  const handleDeactivateAdmin = () => {
+    setIsAdminMode(false);
+    setSecretTapCount(0);
+    Alert.alert('Modo Admin Desativado', 'As ferramentas de depuração foram ocultadas.');
   };
 
   const confirmMissionComplete = (id: string) => {
@@ -232,13 +239,23 @@ const TelaMissoes = () => {
         </TouchableOpacity>
 
         {isAdminMode && (
-          <TouchableOpacity
-            style={styles.resetAdminButton}
-            onPress={handleResetAdmin}
-            activeOpacity={0.6}
-          >
-            <Text style={styles.resetAdminButtonText}>Reset de Admin</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={styles.resetAdminButton}
+              onPress={handleResetAdmin}
+              activeOpacity={0.6}
+            >
+              <Text style={styles.resetAdminButtonText}>Reset de Admin</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.deactivateAdminButton}
+              onPress={handleDeactivateAdmin}
+              activeOpacity={0.6}
+            >
+              <Text style={styles.deactivateAdminButtonText}>Ocultar Modo Admin</Text>
+            </TouchableOpacity>
+          </>
         )}
 
         <Text style={styles.timerText}>

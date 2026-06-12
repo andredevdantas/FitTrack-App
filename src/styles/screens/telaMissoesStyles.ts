@@ -164,4 +164,16 @@ export const styles = StyleSheet.create({
     color: '#7F8C8D',
     fontWeight: '600',
   },
+  deactivateAdminButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  deactivateAdminButtonText: {
+    color: '#7F8C8D',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
 });
