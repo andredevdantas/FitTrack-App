@@ -1,22 +1,15 @@
 import React, { useState, useContext, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { DaysContext } from '../contexts/DaysContext';
 import { DaysOfWeek } from '../types';
 import { styles } from '../styles/screens/telaPrincipalStyles';
-
-type WorkoutPlan = Record<keyof DaysOfWeek, string[]>;
-
-const workoutPlan: WorkoutPlan = {
-  segunda: ['Corrida de 20 minutos', '3 séries de 10 flexões', '15 agachamentos'],
-  terca: ['Caminhada de 30 minutos', '2 séries de 15 burpees', '20 abdominais'],
-  quarta: ['3 séries de 12 levantamento de pernas', '10 minutos de yoga', '20 elevações de quadril'],
-  quinta: ['2 minutos de pular corda', '5 séries de 10 abdominais bicicleta', '15 avanços para cada perna'],
-  sexta: ['Caminhada rápida de 20 minutos', '3 séries de 15 super-homens', '1 minuto de corrida rápida / 1 min caminhada (3x)'],
-};
+import { WorkoutService, Exercise } from '../services/WorkoutService';
 
 const TelaPrincipal = () => {
   const { selectedDays } = useContext(DaysContext);
+  const [workoutPlan, setWorkoutPlan] = useState<Record<keyof DaysOfWeek, Exercise[]> | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [completionStatus, setCompletionStatus] = useState<Partial<Record<keyof DaysOfWeek, boolean>>>({});
   const [currentDay, setCurrentDay] = useState<keyof DaysOfWeek | null>(null);
 
@@ -30,7 +23,21 @@ const TelaPrincipal = () => {
       5: 'sexta',
     };
     setCurrentDay(daysMap[dayIndex] || null);
+
+    loadWorkouts();
   }, []);
+
+  const loadWorkouts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await WorkoutService.fetchWeeklyPlan();
+      setWorkoutPlan(data);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os treinos.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const activeWorkouts = useMemo(() => {
     return (Object.keys(selectedDays) as Array<keyof DaysOfWeek>).filter(
@@ -60,6 +67,7 @@ const TelaPrincipal = () => {
   const renderWorkoutCard = ({ item: day }: { item: keyof DaysOfWeek }) => {
     const isToday = day === currentDay;
     const isCompleted = completionStatus[day];
+    const exercises = workoutPlan ? workoutPlan[day] : [];
 
     return (
       <View style={[styles.card, isToday && styles.cardToday]}>
@@ -75,10 +83,18 @@ const TelaPrincipal = () => {
         </View>
 
         <View style={styles.exercisesContainer}>
-          {workoutPlan[day].map((exercise, index) => (
-            <View key={index} style={styles.exerciseRow}>
-              <FontAwesome5 name="check-circle" size={14} color={isToday ? '#27AE60' : '#A0A0A0'} />
-              <Text style={styles.exerciseText}>{exercise}</Text>
+          {exercises.map((exercise) => (
+            <View key={exercise.id} style={styles.exerciseRow}>
+              <FontAwesome5 
+                name="check-circle" 
+                size={14} 
+                color={isToday ? '#27AE60' : '#A0A0A0'} 
+                style={{ marginTop: 2 }} 
+              />
+              <View style={styles.exerciseTextContainer}>
+                <Text style={styles.exerciseName}>{exercise.name}</Text>
+                <Text style={styles.exerciseDetails}>{exercise.details}</Text>
+              </View>
             </View>
           ))}
         </View>
@@ -104,6 +120,14 @@ const TelaPrincipal = () => {
       </View>
     );
   };
+
+  if (isLoading || !workoutPlan) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#27AE60" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

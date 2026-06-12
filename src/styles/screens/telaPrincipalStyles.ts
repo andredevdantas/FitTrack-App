@@ -5,6 +5,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F4F7F6',
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F4F7F6',
+  },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
@@ -81,14 +87,22 @@ export const styles = StyleSheet.create({
   },
   exerciseRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
-  exerciseText: {
-    fontSize: 15,
-    color: '#555555',
+  exerciseTextContainer: {
     marginLeft: 10,
     flex: 1,
+  },
+  exerciseName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#34495E',
+  },
+  exerciseDetails: {
+    fontSize: 13,
+    color: '#7F8C8D',
+    marginTop: 2,
   },
   button: {
     flexDirection: 'row',
