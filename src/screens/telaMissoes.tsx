@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutService, DailyMission } from '../services/WorkoutService';
 import { styles } from '../styles/screens/telaMissoesStyles';
@@ -10,6 +10,8 @@ const TelaMissoes = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [rerollsLeft, setRerollsLeft] = useState<number>(2);
   const [resetTime, setResetTime] = useState<number>(0);
+  const [secretTapCount, setSecretTapCount] = useState<number>(0);
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
 
   const loadMissions = useCallback(async () => {
     try {
@@ -50,12 +52,33 @@ const TelaMissoes = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleMissionComplete = (id: string) => {
-    if (completedIds.length >= 5) {
-      Alert.alert('Limite Atingido', 'Já completou todas as missões de hoje!');
-      return;
-    }
+  const handleTitlePress = () => {
+    if (isAdminMode) return;
+    
+    setSecretTapCount(prev => {
+      const newCount = prev + 1;
+      if (newCount >= 5) {
+        setIsAdminMode(true);
+        Alert.alert('Modo Admin Ativado', 'O botão de depuração foi habilitado para esta sessão.');
+      }
+      return newCount;
+    });
+  };
 
+  const confirmMissionComplete = (id: string) => {
+    if (completedIds.length >= 5) return;
+
+    Alert.alert(
+      'Confirmar Conclusão',
+      'Você realmente finalizou este exercício? Lembre-se, o maior compromisso é com a sua própria saúde!',
+      [
+        { text: 'Ainda não', style: 'cancel' },
+        { text: 'Sim, eu fiz!', onPress: () => handleMissionComplete(id) }
+      ]
+    );
+  };
+
+  const handleMissionComplete = (id: string) => {
     if (!completedIds.includes(id)) {
       const newCompleted = [...completedIds, id];
       setCompletedIds(newCompleted);
@@ -72,8 +95,20 @@ const TelaMissoes = () => {
 
   const handleGenerateNewMissions = () => {
     if (rerollsLeft > 0 && completedIds.length === 0) {
-      loadMissions();
-      setRerollsLeft(prev => prev - 1);
+      Alert.alert(
+        'Trocar Missões',
+        'Deseja gastar 1 reroll para gerar novas missões?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Trocar', 
+            onPress: () => {
+              loadMissions();
+              setRerollsLeft(prev => prev - 1);
+            } 
+          }
+        ]
+      );
     } else if (completedIds.length > 0 && completedIds.length < 5) {
       Alert.alert('Aviso', 'Não pode trocar as missões depois de já ter começado a completá-las.');
     } else if (completedIds.length === 5) {
@@ -84,8 +119,21 @@ const TelaMissoes = () => {
   };
 
   const handleResetAdmin = () => {
-    loadMissions();
-    setRerollsLeft(2);
+    Alert.alert(
+      'Reset de Administrador',
+      'Esta é uma função de depuração. Ela irá zerar suas missões atuais, remover o XP obtido e restaurar seus rerolls. Deseja prosseguir?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Resetar', 
+          style: 'destructive',
+          onPress: () => {
+            loadMissions();
+            setRerollsLeft(2);
+          } 
+        }
+      ]
+    );
   };
 
   const formatTime = (timeInMs: number) => {
@@ -118,7 +166,7 @@ const TelaMissoes = () => {
 
         <TouchableOpacity
           style={[styles.completeButton, isCompleted && styles.completeButtonActive]}
-          onPress={() => handleMissionComplete(item.id)}
+          onPress={() => confirmMissionComplete(item.id)}
           disabled={isCompleted || completedIds.length >= 5}
           activeOpacity={0.7}
         >
@@ -139,7 +187,11 @@ const TelaMissoes = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Missões Diárias</Text>
+        <TouchableWithoutFeedback onPress={handleTitlePress}>
+          <View>
+            <Text style={styles.title}>Missões Diárias</Text>
+          </View>
+        </TouchableWithoutFeedback>
         
         <View style={styles.progressSection}>
           <View style={styles.progressHeader}>
@@ -179,13 +231,15 @@ const TelaMissoes = () => {
           <Text style={styles.actionButtonText}>Trocar Missões ({rerollsLeft})</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.resetAdminButton}
-          onPress={handleResetAdmin}
-          activeOpacity={0.6}
-        >
-          <Text style={styles.resetAdminButtonText}>Reset de Admin</Text>
-        </TouchableOpacity>
+        {isAdminMode && (
+          <TouchableOpacity
+            style={styles.resetAdminButton}
+            onPress={handleResetAdmin}
+            activeOpacity={0.6}
+          >
+            <Text style={styles.resetAdminButtonText}>Reset de Admin</Text>
+          </TouchableOpacity>
+        )}
 
         <Text style={styles.timerText}>
           Novas missões em: {formatTime(resetTime)}
