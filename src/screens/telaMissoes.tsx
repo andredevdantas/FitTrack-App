@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator, TouchableWithoutFeedback, Animated } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { WorkoutService, DailyMission } from '../services/WorkoutService';
 import { styles } from '../styles/screens/telaMissoesStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
@@ -14,6 +16,17 @@ const TelaMissoes = () => {
   
   const [secretTapCount, setSecretTapCount] = useState<number>(0);
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: completedIds.length,
+      duration: 600, 
+      useNativeDriver: false, 
+    }).start();
+  }, [completedIds.length, progressAnim]);
 
   const getTargetResetTimestamp = (baseDate: Date) => {
     const target = new Date(baseDate);
@@ -65,6 +78,10 @@ const TelaMissoes = () => {
           setCompletedIds(savedCompleted || []);
           setRerollsLeft(savedRerolls !== null ? savedRerolls : 2);
           setIsLoading(false);
+          
+          if (savedCompleted && savedCompleted.length > 0) {
+            progressAnim.setValue(savedCompleted.length);
+          }
           return;
         }
       }
@@ -73,11 +90,13 @@ const TelaMissoes = () => {
     } catch (error) {
       await loadNewMissionsCycle();
     }
-  }, [loadNewMissionsCycle]);
+  }, [loadNewMissionsCycle, progressAnim]);
 
-  useEffect(() => {
-    checkPersistence();
-  }, [checkPersistence]);
+  useFocusEffect(
+    useCallback(() => {
+      checkPersistence();
+    }, [checkPersistence])
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -145,6 +164,9 @@ const TelaMissoes = () => {
       await StorageService.setItem(StorageKeys.TOTAL_MISSIONS_COMPLETED, currentTotalMissions + 1);
 
       if (newCompleted.length === 5) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000); 
+        
         Alert.alert('Parabéns! 🏆', 'Completou todas as missões do dia!');
         setRerollsLeft(0);
         await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 0);
@@ -196,7 +218,11 @@ const TelaMissoes = () => {
       'Zerar missões atuais?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Resetar', style: 'destructive', onPress: () => loadNewMissionsCycle() }
+        { text: 'Resetar', style: 'destructive', onPress: () => {
+            progressAnim.setValue(0);
+            loadNewMissionsCycle();
+          } 
+        }
       ]
     );
   };
@@ -211,6 +237,11 @@ const TelaMissoes = () => {
   const dailyXP = missions
     .filter(m => completedIds.includes(m.id))
     .reduce((sum, current) => sum + current.xp, 0);
+
+  const progressBarWidth = progressAnim.interpolate({
+    inputRange: [0, 5],
+    outputRange: ['0%', '100%'],
+  });
 
   const renderMissionCard = ({ item }: { item: DailyMission }) => {
     const isCompleted = completedIds.includes(item.id);
@@ -264,10 +295,10 @@ const TelaMissoes = () => {
             <Text style={styles.xpText}>{dailyXP} XP Hoje</Text>
           </View>
           <View style={styles.progressBarContainer}>
-            <View 
+            <Animated.View 
               style={[
                 styles.progressBarFill, 
-                { width: `${(completedIds.length / 5) * 100}%` }
+                { width: progressBarWidth }
               ]} 
             />
           </View>
@@ -307,6 +338,15 @@ const TelaMissoes = () => {
 
         <Text style={styles.timerText}>Novas missões em: {formatTime(resetTime)}</Text>
       </View>
+
+      {showConfetti && (
+        <ConfettiCannon 
+          count={150} 
+          origin={{ x: -10, y: 0 }} 
+          fadeOut={true} 
+          fallSpeed={3000}
+        />
+      )}
     </View>
   );
 };
