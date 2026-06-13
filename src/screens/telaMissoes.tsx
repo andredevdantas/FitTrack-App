@@ -49,6 +49,10 @@ const TelaMissoes = () => {
     try {
       setIsLoading(true);
       const nowTs = new Date().getTime();
+      
+      const savedAdmin = await StorageService.getItem<boolean>(StorageKeys.IS_ADMIN_MODE);
+      if (savedAdmin) setIsAdminMode(true);
+
       const savedResetTs = await StorageService.getItem<number>(StorageKeys.MISSOES_LAST_DATE);
 
       if (savedResetTs && nowTs < savedResetTs) {
@@ -98,7 +102,8 @@ const TelaMissoes = () => {
       const newCount = prev + 1;
       if (newCount >= 5) {
         setIsAdminMode(true);
-        Alert.alert('Modo Admin Ativado', 'O botão de depuração foi habilitado para esta sessão.');
+        StorageService.setItem(StorageKeys.IS_ADMIN_MODE, true);
+        Alert.alert('Modo Admin Ativado', 'O botão de depuração foi habilitado globalmente para esta sessão.');
       }
       return newCount;
     });
@@ -107,6 +112,7 @@ const TelaMissoes = () => {
   const handleDeactivateAdmin = () => {
     setIsAdminMode(false);
     setSecretTapCount(0);
+    StorageService.setItem(StorageKeys.IS_ADMIN_MODE, false);
     Alert.alert('Modo Admin Desativado', 'As ferramentas de depuração foram ocultadas.');
   };
 
@@ -115,7 +121,7 @@ const TelaMissoes = () => {
 
     Alert.alert(
       'Confirmar Conclusão',
-      'Você realmente finalizou este exercício? Lembre-se, o maior compromisso é com a sua própria saúde!',
+      'Você realmente finalizou este exercício?',
       [
         { text: 'Ainda não', style: 'cancel' },
         { text: 'Sim, eu fiz!', onPress: () => handleMissionComplete(id) }
@@ -125,15 +131,21 @@ const TelaMissoes = () => {
 
   const handleMissionComplete = async (id: string) => {
     if (!completedIds.includes(id)) {
+      const mission = missions.find(m => m.id === id);
+      const missionXp = mission ? mission.xp : 0;
+
       const newCompleted = [...completedIds, id];
       setCompletedIds(newCompleted);
       await StorageService.setItem(StorageKeys.MISSOES_COMPLETED, newCompleted);
 
+      const currentTotalXp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
+      await StorageService.setItem(StorageKeys.USER_TOTAL_XP, currentTotalXp + missionXp);
+
+      const currentTotalMissions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
+      await StorageService.setItem(StorageKeys.TOTAL_MISSIONS_COMPLETED, currentTotalMissions + 1);
+
       if (newCompleted.length === 5) {
-        Alert.alert(
-          'Parabéns! 🏆', 
-          'Completou todas as missões do dia! As missões serão reiniciadas às 04:00 da manhã.'
-        );
+        Alert.alert('Parabéns! 🏆', 'Completou todas as missões do dia!');
         setRerollsLeft(0);
         await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 0);
       }
@@ -170,7 +182,7 @@ const TelaMissoes = () => {
         ]
       );
     } else if (completedIds.length > 0 && completedIds.length < 5) {
-      Alert.alert('Aviso', 'Não pode trocar as missões depois de já ter começado a completá-las.');
+      Alert.alert('Aviso', 'Não pode trocar as missões depois de já ter começado.');
     } else if (completedIds.length === 5) {
       Alert.alert('Missões Concluídas', 'Já completou todas as missões de hoje.');
     } else {
@@ -181,16 +193,10 @@ const TelaMissoes = () => {
   const handleResetAdmin = () => {
     Alert.alert(
       'Reset de Administrador',
-      'Esta é uma função de depuração. Ela irá zerar suas missões atuais, remover o XP obtido e restaurar seus rerolls. Deseja prosseguir?',
+      'Zerar missões atuais?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Resetar', 
-          style: 'destructive',
-          onPress: () => {
-            loadNewMissionsCycle();
-          } 
-        }
+        { text: 'Resetar', style: 'destructive', onPress: () => loadNewMissionsCycle() }
       ]
     );
   };
@@ -202,7 +208,7 @@ const TelaMissoes = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const totalXP = missions
+  const dailyXP = missions
     .filter(m => completedIds.includes(m.id))
     .reduce((sum, current) => sum + current.xp, 0);
 
@@ -255,7 +261,7 @@ const TelaMissoes = () => {
         <View style={styles.progressSection}>
           <View style={styles.progressHeader}>
             <Text style={styles.progressText}>{completedIds.length}/5 Concluídas</Text>
-            <Text style={styles.xpText}>{totalXP} XP Obtido</Text>
+            <Text style={styles.xpText}>{dailyXP} XP Hoje</Text>
           </View>
           <View style={styles.progressBarContainer}>
             <View 
@@ -279,10 +285,7 @@ const TelaMissoes = () => {
 
       <View style={styles.actionsContainer}>
         <TouchableOpacity
-          style={[
-            styles.actionButton, 
-            (rerollsLeft <= 0 || completedIds.length > 0) && styles.actionButtonDisabled
-          ]}
+          style={[styles.actionButton, (rerollsLeft <= 0 || completedIds.length > 0) && styles.actionButtonDisabled]}
           onPress={handleGenerateNewMissions}
           disabled={rerollsLeft <= 0 || completedIds.length > 0}
           activeOpacity={0.8}
@@ -293,27 +296,16 @@ const TelaMissoes = () => {
 
         {isAdminMode && (
           <>
-            <TouchableOpacity
-              style={styles.resetAdminButton}
-              onPress={handleResetAdmin}
-              activeOpacity={0.6}
-            >
+            <TouchableOpacity style={styles.resetAdminButton} onPress={handleResetAdmin} activeOpacity={0.6}>
               <Text style={styles.resetAdminButtonText}>Reset de Admin</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.deactivateAdminButton}
-              onPress={handleDeactivateAdmin}
-              activeOpacity={0.6}
-            >
+            <TouchableOpacity style={styles.deactivateAdminButton} onPress={handleDeactivateAdmin} activeOpacity={0.6}>
               <Text style={styles.deactivateAdminButtonText}>Ocultar Modo Admin</Text>
             </TouchableOpacity>
           </>
         )}
 
-        <Text style={styles.timerText}>
-          Novas missões em: {formatTime(resetTime)}
-        </Text>
+        <Text style={styles.timerText}>Novas missões em: {formatTime(resetTime)}</Text>
       </View>
     </View>
   );
