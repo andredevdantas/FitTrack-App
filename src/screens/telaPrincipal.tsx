@@ -32,7 +32,6 @@ const TelaPrincipal = () => {
     try {
       setIsLoading(true);
       const data = await WorkoutService.fetchWeeklyPlan();
-      
       setWorkoutPlan(data);
 
       const todayStr = new Date().toDateString();
@@ -78,6 +77,9 @@ const TelaPrincipal = () => {
     setCompletionStatus(updatedStatus);
     await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
     
+    const currentWorkouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
+    await StorageService.setItem(StorageKeys.TOTAL_WORKOUTS_COMPLETED, currentWorkouts + 1);
+
     Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso.`);
   }, [currentDay, completionStatus]);
 
