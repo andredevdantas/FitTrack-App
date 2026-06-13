@@ -7,12 +7,18 @@ export const StorageKeys = {
   MISSIONS: '@FitTrack:missions',
   MISSIONS_DATE: '@FitTrack:missionsDate',
   MEDALS: '@FitTrack:medals',
+  
   PRINCIPAL_COMPLETION: '@FitTrack:principalCompletion',
   PRINCIPAL_LAST_DATE: '@FitTrack:principalLastDate',
   MISSOES_LIST: '@FitTrack:missoesList',
   MISSOES_COMPLETED: '@FitTrack:missoesCompleted',
   MISSOES_REROLLS: '@FitTrack:missoesRerolls',
   MISSOES_LAST_DATE: '@FitTrack:missoesLastDate',
+
+  USER_TOTAL_XP: '@FitTrack:userTotalXp',
+  TOTAL_MISSIONS_COMPLETED: '@FitTrack:totalMissionsCompleted',
+  TOTAL_WORKOUTS_COMPLETED: '@FitTrack:totalWorkoutsCompleted',
+  IS_ADMIN_MODE: '@FitTrack:isAdminMode',
 };
 
 export const StorageService = {
@@ -21,7 +27,7 @@ export const StorageService = {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem(key, jsonValue);
     } catch (error) {
-      console.error(`Erro ao salvar dados na chave ${key}`, error);
+      console.error(error);
     }
   },
 
@@ -30,7 +36,7 @@ export const StorageService = {
       const jsonValue = await AsyncStorage.getItem(key);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (error) {
-      console.error(`Erro ao recuperar dados da chave ${key}`, error);
+      console.error(error);
       return null;
     }
   },
@@ -39,7 +45,7 @@ export const StorageService = {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error(`Erro ao remover dados da chave ${key}`, error);
+      console.error(error);
     }
   },
 };
