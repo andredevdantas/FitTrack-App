@@ -12,6 +12,15 @@ export interface DailyMission {
   xp: number;
 }
 
+export interface Medal {
+  id: string;
+  name: string;
+  description: string;
+  xpRequired: number;
+  icon: string;
+  color: string;
+}
+
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const MOCK_WORKOUTS: Record<keyof DaysOfWeek, Exercise[]> = {
@@ -43,14 +52,23 @@ const MOCK_WORKOUTS: Record<keyof DaysOfWeek, Exercise[]> = {
 };
 
 const MOCK_MISSIONS: DailyMission[] = [
-  { id: 'm-1', description: '20 minutos de corrida leve', xp: 50 },
-  { id: 'm-2', description: '10 flexões de braço', xp: 30 },
-  { id: 'm-3', description: '15 agachamentos', xp: 30 },
-  { id: 'm-4', description: '5 minutos de prancha', xp: 40 },
-  { id: 'm-5', description: '20 abdominais', xp: 20 },
-  { id: 'm-6', description: '3 séries de polichinelos', xp: 30 },
-  { id: 'm-7', description: '10 burpees', xp: 50 },
-  { id: 'm-8', description: '10 minutos de yoga', xp: 40 }
+  { id: 'm-1', description: '20 Minutos de Corrida leve', xp: 50 },
+  { id: 'm-2', description: '10 Flexões de Braço', xp: 30 },
+  { id: 'm-3', description: '15 Agachamentos', xp: 30 },
+  { id: 'm-4', description: '5 Minutos de Prancha', xp: 40 },
+  { id: 'm-5', description: '20 Abdominais', xp: 20 },
+  { id: 'm-6', description: '3 Séries de Polichinelos', xp: 30 },
+  { id: 'm-7', description: '10 Burpees', xp: 50 },
+  { id: 'm-8', description: '10 Minutos de Yoga', xp: 40 }
+];
+
+const MOCK_MEDALS: Medal[] = [
+  { id: 'md-1', name: 'Primeiro Passo', description: 'Iniciou a jornada', xpRequired: 0, icon: 'shoe-prints', color: '#3498DB' },
+  { id: 'md-2', name: 'Iniciante', description: 'Alcançou 100 XP', xpRequired: 100, icon: 'medal', color: '#CD7F32' },
+  { id: 'md-3', name: 'Consistente', description: 'Alcançou 300 XP', xpRequired: 300, icon: 'medal', color: '#BDC3C7' },
+  { id: 'md-4', name: 'Mestre', description: 'Alcançou 600 XP', xpRequired: 600, icon: 'trophy', color: '#F1C40F' },
+  { id: 'md-5', name: 'Lenda', description: 'Alcançou 1000 XP', xpRequired: 1000, icon: 'crown', color: '#9B59B6' },
+  { id: 'md-6', name: 'Imparável', description: 'Alcançou 2000 XP', xpRequired: 2000, icon: 'fire', color: '#E74C3C' }
 ];
 
 export const WorkoutService = {
@@ -63,5 +81,10 @@ export const WorkoutService = {
     await delay(600);
     const shuffled = [...MOCK_MISSIONS].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 5);
+  },
+
+  async fetchMedals(): Promise<Medal[]> {
+    await delay(500);
+    return MOCK_MEDALS;
   }
 };
