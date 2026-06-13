@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutService, Medal } from '../services/WorkoutService';
@@ -49,6 +49,26 @@ const TelaMedalhas = () => {
     const newXp = userStats.xp + 100;
     await StorageService.setItem(StorageKeys.USER_TOTAL_XP, newXp);
     setUserStats(prev => ({ ...prev, xp: newXp }));
+  };
+
+  const handleResetStats = () => {
+    Alert.alert(
+      'Reset Global',
+      'Isto irá zerar todo o seu XP acumulado, treinos e missões globais. As medalhas bloqueadas voltarão ao estado original. Tem certeza?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Zerar Tudo',
+          style: 'destructive',
+          onPress: async () => {
+            await StorageService.setItem(StorageKeys.USER_TOTAL_XP, 0);
+            await StorageService.setItem(StorageKeys.TOTAL_MISSIONS_COMPLETED, 0);
+            await StorageService.setItem(StorageKeys.TOTAL_WORKOUTS_COMPLETED, 0);
+            setUserStats({ xp: 0, missions: 0, workouts: 0 });
+          }
+        }
+      ]
+    );
   };
 
   const renderMedalCard = ({ item }: { item: Medal }) => {
@@ -109,12 +129,19 @@ const TelaMedalhas = () => {
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Conquistas</Text>
-          {isAdmin && (
-            <TouchableOpacity style={styles.demoButton} onPress={addDemoXP} activeOpacity={0.7}>
-              <Text style={styles.demoButtonText}>+100 XP (Admin)</Text>
-            </TouchableOpacity>
-          )}
         </View>
+
+        {isAdmin && (
+          <View style={styles.adminButtonsContainer}>
+            <TouchableOpacity style={styles.demoButton} onPress={addDemoXP} activeOpacity={0.7}>
+              <Text style={styles.demoButtonText}>+100 XP (Demo)</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.resetStatsButton} onPress={handleResetStats} activeOpacity={0.7}>
+              <Text style={styles.resetStatsButtonText}>Zerar Progresso</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View style={styles.statsCard}>
           <Text style={styles.statsLabel}>XP Total Acumulado</Text>
