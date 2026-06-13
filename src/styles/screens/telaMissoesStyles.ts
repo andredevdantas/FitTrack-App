@@ -1,21 +1,22 @@
 import { StyleSheet } from 'react-native';
+import { theme } from '../theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
@@ -28,7 +29,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
   },
   progressSection: {
     marginTop: 16,
@@ -41,22 +42,22 @@ export const styles = StyleSheet.create({
   progressText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#34495E',
+    color: theme.colors.textDark,
   },
   xpText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#F39C12',
+    color: theme.colors.warning,
   },
   progressBarContainer: {
     height: 12,
-    backgroundColor: '#E5E8E8',
+    backgroundColor: theme.colors.border,
     borderRadius: 6,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#27AE60',
+    backgroundColor: theme.colors.primary,
     borderRadius: 6,
   },
   list: {
@@ -68,7 +69,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   missionCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -80,11 +81,11 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     borderLeftWidth: 4,
-    borderLeftColor: '#F39C12',
+    borderLeftColor: theme.colors.warning,
   },
   missionCardCompleted: {
-    borderLeftColor: '#27AE60',
-    backgroundColor: '#FAFAFA',
+    borderLeftColor: theme.colors.primary,
+    backgroundColor: theme.colors.cardLockedBg,
     opacity: 0.8,
   },
   missionInfo: {
@@ -93,13 +94,13 @@ export const styles = StyleSheet.create({
   },
   missionDescription: {
     fontSize: 16,
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
     fontWeight: '600',
     marginBottom: 4,
   },
   missionDescriptionCompleted: {
     textDecorationLine: 'line-through',
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
   },
   xpBadge: {
     flexDirection: 'row',
@@ -107,7 +108,7 @@ export const styles = StyleSheet.create({
   },
   xpBadgeText: {
     fontSize: 14,
-    color: '#F39C12',
+    color: theme.colors.warning,
     fontWeight: 'bold',
     marginLeft: 4,
   },
@@ -115,18 +116,18 @@ export const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E5E8E8',
+    borderColor: theme.colors.border,
   },
   completeButtonActive: {
-    backgroundColor: '#27AE60',
-    borderColor: '#27AE60',
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
   },
   actionsContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 20,
@@ -140,7 +141,7 @@ export const styles = StyleSheet.create({
   },
   actionButton: {
     flexDirection: 'row',
-    backgroundColor: '#34495E',
+    backgroundColor: theme.colors.textDark,
     paddingVertical: 14,
     borderRadius: 10,
     justifyContent: 'center',
@@ -148,18 +149,18 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   actionButtonDisabled: {
-    backgroundColor: '#95A5A6',
+    backgroundColor: theme.colors.textMuted,
   },
   actionButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
   },
   resetAdminButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: theme.colors.transparent,
     borderWidth: 1,
-    borderColor: '#E74C3C',
+    borderColor: theme.colors.danger,
     paddingVertical: 14,
     borderRadius: 10,
     justifyContent: 'center',
@@ -167,26 +168,26 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   resetAdminButtonText: {
-    color: '#E74C3C',
+    color: theme.colors.danger,
     fontSize: 16,
     fontWeight: 'bold',
   },
   deactivateAdminButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: theme.colors.transparent,
     paddingVertical: 4,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
   deactivateAdminButtonText: {
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     fontSize: 14,
     textDecorationLine: 'underline',
   },
   timerText: {
     textAlign: 'center',
     fontSize: 14,
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     fontWeight: '600',
   },
 });

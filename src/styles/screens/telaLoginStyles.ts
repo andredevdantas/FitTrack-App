@@ -1,14 +1,15 @@
 import { StyleSheet } from 'react-native';
+import { theme } from '../theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
     justifyContent: 'center',
     padding: 20,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 24,
     shadowColor: '#000',
@@ -20,13 +21,13 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -36,32 +37,32 @@ export const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#34495E',
+    color: theme.colors.textDark,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#F8F9F9',
+    backgroundColor: theme.colors.inputBg,
     borderWidth: 1,
-    borderColor: '#E5E8E8',
+    borderColor: theme.colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
   },
   button: {
-    backgroundColor: '#27AE60', 
+    backgroundColor: theme.colors.primary, 
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 24,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },
   error: {
-    color: '#E74C3C',
+    color: theme.colors.danger,
     fontSize: 14,
     textAlign: 'center',
     marginTop: 8,

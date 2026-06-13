@@ -1,10 +1,11 @@
 import { StyleSheet } from 'react-native';
+import { theme } from '../theme';
 
 export const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E5E8E8',
+    borderTopColor: theme.colors.border,
     height: 65,
     paddingBottom: 10,
     paddingTop: 10,
@@ -17,6 +18,6 @@ export const styles = StyleSheet.create({
 });
 
 export const tabBarColors = {
-  active: '#27AE60',
-  inactive: '#A0A0A0',
+  active: theme.colors.primary,
+  inactive: theme.colors.inactive,
 };

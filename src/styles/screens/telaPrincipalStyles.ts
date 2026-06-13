@@ -1,21 +1,22 @@
 import { StyleSheet } from 'react-native';
+import { theme } from '../theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
@@ -28,11 +29,11 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     marginTop: 4,
   },
   list: {
@@ -43,7 +44,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -53,10 +54,10 @@ export const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
     borderLeftWidth: 4,
-    borderLeftColor: '#E5E8E8',
+    borderLeftColor: theme.colors.border,
   },
   cardToday: {
-    borderLeftColor: '#27AE60',
+    borderLeftColor: theme.colors.primary,
     shadowOpacity: 0.1,
     elevation: 4,
   },
@@ -69,19 +70,19 @@ export const styles = StyleSheet.create({
   dayTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#34495E',
+    color: theme.colors.textDark,
   },
   dayTitleToday: {
-    color: '#27AE60',
+    color: theme.colors.primary,
   },
   badgeToday: {
-    backgroundColor: '#E8F8F5',
+    backgroundColor: theme.colors.badgeBg,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   badgeText: {
-    color: '#27AE60',
+    color: theme.colors.primary,
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -100,11 +101,11 @@ export const styles = StyleSheet.create({
   exerciseName: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#34495E',
+    color: theme.colors.textDark,
   },
   exerciseDetails: {
     fontSize: 13,
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     marginTop: 2,
   },
   button: {
@@ -116,13 +117,13 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonActive: {
-    backgroundColor: '#27AE60',
+    backgroundColor: theme.colors.primary,
   },
   buttonCompleted: {
-    backgroundColor: '#95A5A6',
+    backgroundColor: theme.colors.textMuted,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -133,7 +134,7 @@ export const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     textAlign: 'center',
     marginTop: 16,
     paddingHorizontal: 20,

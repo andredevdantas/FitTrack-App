@@ -1,21 +1,22 @@
 import { StyleSheet } from 'react-native';
+import { theme } from '../theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F4F7F6',
+    backgroundColor: theme.colors.background,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: '#000',
@@ -33,52 +34,52 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
   },
   adminButtonsContainer: {
     flexDirection: 'row',
     marginTop: 12,
   },
   demoButton: {
-    backgroundColor: '#F39C12',
+    backgroundColor: theme.colors.warning,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     marginRight: 8,
   },
   demoButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontWeight: 'bold',
     fontSize: 12,
   },
   resetStatsButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: theme.colors.transparent,
     borderWidth: 1,
-    borderColor: '#E74C3C',
+    borderColor: theme.colors.danger,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },
   resetStatsButtonText: {
-    color: '#E74C3C',
+    color: theme.colors.danger,
     fontWeight: 'bold',
     fontSize: 12,
   },
   statsCard: {
-    backgroundColor: '#2C3E50',
+    backgroundColor: theme.colors.textTitle,
     borderRadius: 16,
     padding: 20,
     marginTop: 20,
     alignItems: 'center',
   },
   statsLabel: {
-    color: '#BDC3C7',
+    color: theme.colors.border,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
   },
   statsValue: {
-    color: '#F1C40F',
+    color: theme.colors.warning,
     fontSize: 32,
     fontWeight: 'bold',
   },
@@ -90,7 +91,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   medalCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
@@ -103,7 +104,7 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
   medalCardLocked: {
-    backgroundColor: '#FAFAFA',
+    backgroundColor: theme.colors.cardLockedBg,
     opacity: 0.7,
   },
   iconContainer: {
@@ -115,24 +116,24 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconContainerLocked: {
-    backgroundColor: '#E5E8E8',
+    backgroundColor: theme.colors.border,
   },
   medalName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: theme.colors.textTitle,
     textAlign: 'center',
     marginBottom: 4,
   },
   medalDescription: {
     fontSize: 12,
-    color: '#7F8C8D',
+    color: theme.colors.textBody,
     textAlign: 'center',
   },
   lockedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F4F4',
+    backgroundColor: theme.colors.badgeLockedBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -140,7 +141,7 @@ export const styles = StyleSheet.create({
   },
   lockedText: {
     fontSize: 10,
-    color: '#95A5A6',
+    color: theme.colors.textMuted,
     fontWeight: 'bold',
     marginLeft: 4,
   },
