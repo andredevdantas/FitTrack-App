@@ -1,7 +1,8 @@
 import React, { useState, useContext, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { DaysContext } from '../contexts/DaysContext';
 import { DaysOfWeek } from '../types';
 import { StorageService, StorageKeys } from '../storage/StorageService';
@@ -10,18 +11,22 @@ import { theme } from '../styles/theme';
 
 const TelaPerfil = () => {
   const { selectedDays, toggleDay } = useContext(DaysContext);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [userStats, setUserStats] = useState({
     xp: 0,
     missions: 0,
     workouts: 0,
   });
 
-  const loadStats = async () => {
+  const loadData = async () => {
     try {
       const xp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
       const missions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
       const workouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
       setUserStats({ xp, missions, workouts });
+
+      const savedImage = await StorageService.getItem<string>(StorageKeys.USER_PROFILE_IMAGE);
+      if (savedImage) setProfileImage(savedImage);
     } catch (error) {
       console.error(error);
     }
@@ -29,9 +34,31 @@ const TelaPerfil = () => {
 
   useFocusEffect(
     useCallback(() => {
-      loadStats();
+      loadData();
     }, [])
   );
+
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permissão negada', 'Precisamos de acesso à sua galeria para alterar a foto de perfil.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      setProfileImage(imageUri);
+      await StorageService.setItem(StorageKeys.USER_PROFILE_IMAGE, imageUri);
+    }
+  };
 
   const daysList: { key: keyof DaysOfWeek; label: string }[] = [
     { key: 'segunda', label: 'Segunda-feira' },
@@ -39,18 +66,20 @@ const TelaPerfil = () => {
     { key: 'quarta', label: 'Quarta-feira' },
     { key: 'quinta', label: 'Quinta-feira' },
     { key: 'sexta', label: 'Sexta-feira' },
+    { key: 'sabado', label: 'Sábado' },
+    { key: 'domingo', label: 'Domingo' },
   ];
 
   const handleLogout = () => {
     Alert.alert(
       'Sair da Conta',
-      'Tem certeza que deseja terminar a sessão? Os seus dados de progresso continuarão salvos no dispositivo.',
+      'Tem certeza que deseja terminar a sessão?',
       [
         { text: 'Cancelar', style: 'cancel' },
         { 
           text: 'Sair', 
           style: 'destructive',
-          onPress: () => Alert.alert('Aviso', 'A função de logout reencaminhará para a Tela de Login na estrutura de navegação raiz.')
+          onPress: () => Alert.alert('Aviso', 'Logout acionado.')
         }
       ]
     );
@@ -59,9 +88,19 @@ const TelaPerfil = () => {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <FontAwesome5 name="user-alt" size={40} color={theme.colors.primary} />
-        </View>
+        <TouchableOpacity activeOpacity={0.8} onPress={handlePickImage}>
+          <View style={styles.avatarContainer}>
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.profileImage} />
+            ) : (
+              <FontAwesome5 name="user-alt" size={40} color={theme.colors.primary} />
+            )}
+            <View style={styles.editBadge}>
+              <FontAwesome5 name="camera" size={12} color={theme.colors.surface} />
+            </View>
+          </View>
+        </TouchableOpacity>
+        
         <Text style={styles.userName}>Atleta FitTrack</Text>
         <Text style={styles.userEmail}>focado@fittrack.app</Text>
 

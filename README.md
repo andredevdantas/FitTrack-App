@@ -46,7 +46,7 @@ src/
 
 1. Clone este repositório:
 ```
-   git clone [https://github.com/andredevdantas/FitTrack-App.git](https://github.com/andredevdantas/FitTrack-App.git)
+   git clone [https://github.com/andredevdantas/FitTrack-App.git]
    ```
    
 2. Acesse a pasta do projeto e certifique-se de ter o Node.js instalado:

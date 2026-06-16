@@ -24,6 +24,8 @@ export interface DaysOfWeek {
   quarta: boolean;
   quinta: boolean;
   sexta: boolean;
+  sabado: boolean;
+  domingo: boolean;
 }
 
 export type RootStackParamList = {

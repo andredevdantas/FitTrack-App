@@ -49,6 +49,14 @@ const MOCK_WORKOUTS: Record<keyof DaysOfWeek, Exercise[]> = {
     { id: 'sex-1', name: 'Caminhada Rápida', details: '20 Minutos' },
     { id: 'sex-2', name: 'Super-Homens (Lombar)', details: '3 Séries de 15 Repetições' },
     { id: 'sex-3', name: 'HIIT Corrida', details: '1 Min Corrida / 1 Min Caminhada (3x)' }
+  ],
+  sabado: [
+    { id: 'sab-1', name: 'Corrida Longa', details: '40 Minutos em Ritmo Moderado' },
+    { id: 'sab-2', name: 'Alongamento Completo', details: '15 Minutos de Mobilidade' }
+  ],
+  domingo: [
+    { id: 'dom-1', name: 'Descanso Ativo', details: 'Caminhada Leve de 20 Minutos no Parque' },
+    { id: 'dom-2', name: 'Yoga Restaurativa', details: '20 Minutos' }
   ]
 };
 

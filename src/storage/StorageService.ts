@@ -19,6 +19,7 @@ export const StorageKeys = {
   TOTAL_MISSIONS_COMPLETED: '@FitTrack:totalMissionsCompleted',
   TOTAL_WORKOUTS_COMPLETED: '@FitTrack:totalWorkoutsCompleted',
   IS_ADMIN_MODE: '@FitTrack:isAdminMode',
+  USER_PROFILE_IMAGE: '@FitTrack:userProfileImage',
 };
 
 export const StorageService = {
