@@ -76,11 +76,14 @@ const TelaPrincipal = () => {
     const updatedStatus = { ...completionStatus, [day]: true };
     setCompletionStatus(updatedStatus);
     await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
-    
+
     const currentWorkouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
     await StorageService.setItem(StorageKeys.TOTAL_WORKOUTS_COMPLETED, currentWorkouts + 1);
 
-    Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso.`);
+    const currentTotalXp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
+    await StorageService.setItem(StorageKeys.USER_TOTAL_XP, currentTotalXp + 150);
+
+    Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso e ganhou +150 XP!`);
   }, [currentDay, completionStatus]);
 
   const capitalizeFirstLetter = (string: string) => {

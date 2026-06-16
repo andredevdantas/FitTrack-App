@@ -1,6 +1,6 @@
 import React, { useState, useContext, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { DaysContext } from '../contexts/DaysContext';
@@ -11,6 +11,7 @@ import { theme } from '../styles/theme';
 
 const TelaPerfil = () => {
   const { selectedDays, toggleDay } = useContext(DaysContext);
+  const navigation = useNavigation<any>();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [userStats, setUserStats] = useState({
     xp: 0,
@@ -79,7 +80,12 @@ const TelaPerfil = () => {
         { 
           text: 'Sair', 
           style: 'destructive',
-          onPress: () => Alert.alert('Aviso', 'Logout acionado.')
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
+          }
         }
       ]
     );
