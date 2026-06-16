@@ -1,17 +1,20 @@
 import React, { useState, useContext, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Image, Switch } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { DaysContext } from '../contexts/DaysContext';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { DaysOfWeek } from '../types';
 import { StorageService, StorageKeys } from '../storage/StorageService';
-import { styles } from '../styles/screens/telaPerfilStyles';
-import { theme } from '../styles/theme';
+import { getStyles } from '../styles/screens/telaPerfilStyles';
 
 const TelaPerfil = () => {
   const { selectedDays, toggleDay } = useContext(DaysContext);
+  const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
   const navigation = useNavigation<any>();
+  const styles = getStyles(theme);
+
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [userStats, setUserStats] = useState({
     xp: 0,
@@ -43,7 +46,7 @@ const TelaPerfil = () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (status !== 'granted') {
-      Alert.alert('Permissão negada', 'Precisamos de acesso à sua galeria para alterar a foto de perfil.');
+      Alert.alert('Permissão negada', 'Precisamos de acesso à sua galeria.');
       return;
     }
 
@@ -72,23 +75,16 @@ const TelaPerfil = () => {
   ];
 
   const handleLogout = () => {
-    Alert.alert(
-      'Sair da Conta',
-      'Tem certeza que deseja terminar a sessão?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Sair', 
-          style: 'destructive',
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Login' }],
-            });
-          }
+    Alert.alert('Sair da Conta', 'Tem certeza que deseja terminar a sessão?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { 
+        text: 'Sair', 
+        style: 'destructive',
+        onPress: () => {
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         }
-      ]
-    );
+      }
+    ]);
   };
 
   return (
@@ -129,8 +125,23 @@ const TelaPerfil = () => {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Configurações</Text>
+        <View style={styles.cardContainer}>
+          <View style={[styles.row, styles.rowLast]}>
+            <Text style={styles.rowText}>Modo Escuro</Text>
+            <Switch 
+              value={isDarkMode} 
+              onValueChange={toggleTheme}
+              trackColor={{ false: '#E5E8E8', true: theme.colors.primary }}
+              thumbColor={theme.colors.surface}
+            />
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>O Meu Plano de Treino</Text>
-        <View style={styles.daysContainer}>
+        <View style={styles.cardContainer}>
           {daysList.map((day, index) => {
             const isActive = selectedDays[day.key];
             const isLast = index === daysList.length - 1;
@@ -138,11 +149,11 @@ const TelaPerfil = () => {
             return (
               <TouchableOpacity
                 key={day.key}
-                style={[styles.dayRow, isLast && styles.dayRowLast]}
+                style={[styles.row, isLast && styles.rowLast]}
                 onPress={() => toggleDay(day.key)}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.dayText, isActive && styles.dayTextActive]}>
+                <Text style={[styles.rowText, isActive && styles.rowTextActive]}>
                   {day.label}
                 </Text>
                 <View style={[styles.toggleButton, isActive && styles.toggleButtonActive]}>

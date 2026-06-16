@@ -1,7 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '../theme';
-
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -27,6 +25,24 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  editBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: theme.colors.primary,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.surface,
   },
   userName: {
     fontSize: 24,
@@ -72,7 +88,7 @@ export const styles = StyleSheet.create({
     color: theme.colors.textTitle,
     marginBottom: 16,
   },
-  daysContainer: {
+  cardContainer: {
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 16,
@@ -82,7 +98,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  dayRow: {
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -90,14 +106,14 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  dayRowLast: {
+  rowLast: {
     borderBottomWidth: 0,
   },
-  dayText: {
+  rowText: {
     fontSize: 16,
     color: theme.colors.textDark,
   },
-  dayTextActive: {
+  rowTextActive: {
     color: theme.colors.primary,
     fontWeight: 'bold',
   },
@@ -132,23 +148,5 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: theme.colors.primary,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.surface,
   },
 });
