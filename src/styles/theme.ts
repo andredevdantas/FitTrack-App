@@ -1,4 +1,4 @@
-export const theme = {
+export const lightTheme = {
   colors: {
     primary: '#27AE60',
     background: '#F4F7F6',
@@ -18,3 +18,26 @@ export const theme = {
     transparent: 'transparent',
   }
 };
+
+export const darkTheme = {
+  colors: {
+    primary: '#2ECC71',
+    background: '#121212',
+    surface: '#1E1E1E',
+    textTitle: '#FFFFFF',
+    textBody: '#A0A0A0',
+    textDark: '#E0E0E0',
+    textMuted: '#707070',
+    border: '#333333',
+    warning: '#F1C40F',
+    danger: '#E74C3C',
+    inactive: '#555555',
+    badgeBg: '#1B3A2B',
+    inputBg: '#2C2C2C',
+    cardLockedBg: '#1A1A1A',
+    badgeLockedBg: '#252525',
+    transparent: 'transparent',
+  }
+};
+
+export const theme = lightTheme;
