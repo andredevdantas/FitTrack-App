@@ -1,0 +1,136 @@
+import { StyleSheet } from 'react-native';
+import { theme } from '../theme';
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  header: {
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: 30,
+    backgroundColor: theme.colors.surface,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  avatarContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: theme.colors.badgeBg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: theme.colors.textBody,
+    marginTop: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: 24,
+    width: '100%',
+  },
+  statBox: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: theme.colors.primary,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: theme.colors.textBody,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  statDivider: {
+    width: 1,
+    height: '100%',
+    backgroundColor: theme.colors.border,
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+    marginBottom: 16,
+  },
+  daysContainer: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  dayRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  dayRowLast: {
+    borderBottomWidth: 0,
+  },
+  dayText: {
+    fontSize: 16,
+    color: theme.colors.textDark,
+  },
+  dayTextActive: {
+    color: theme.colors.primary,
+    fontWeight: 'bold',
+  },
+  toggleButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  logoutButton: {
+    marginHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 40,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  logoutButtonText: {
+    color: theme.colors.danger,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+});
