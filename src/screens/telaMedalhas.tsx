@@ -1,12 +1,16 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutService, Medal } from '../services/WorkoutService';
-import { styles } from '../styles/screens/telaMedalhasStyles';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { getStyles } from '../styles/screens/telaMedalhasStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
 const TelaMedalhas = () => {
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
+
   const [medals, setMedals] = useState<Medal[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
@@ -74,7 +78,6 @@ const TelaMedalhas = () => {
   const renderMedalCard = ({ item }: { item: Medal }) => {
     let isUnlocked = false;
     let progressText = '';
-
     if (item.type === 'xp') {
       isUnlocked = userStats.xp >= item.requirement;
       progressText = `Faltam ${item.requirement - userStats.xp} XP`;
@@ -97,7 +100,7 @@ const TelaMedalhas = () => {
           <FontAwesome5 
             name={item.icon} 
             size={28} 
-            color={isUnlocked ? item.color : '#BDC3C7'} 
+            color={isUnlocked ? item.color : theme.colors.inactive} 
           />
         </View>
         
@@ -108,7 +111,7 @@ const TelaMedalhas = () => {
 
         {!isUnlocked && (
           <View style={styles.lockedBadge}>
-            <FontAwesome5 name="lock" size={10} color="#95A5A6" />
+            <FontAwesome5 name="lock" size={10} color={theme.colors.textMuted} />
             <Text style={styles.lockedText}>{progressText}</Text>
           </View>
         )}
@@ -119,7 +122,7 @@ const TelaMedalhas = () => {
   if (isLoading && medals.length === 0) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#27AE60" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
