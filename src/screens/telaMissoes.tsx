@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator, TouchableWithoutFeedback, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { WorkoutService, DailyMission } from '../services/WorkoutService';
-import { styles } from '../styles/screens/telaMissoesStyles';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { getStyles } from '../styles/screens/telaMissoesStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
 const TelaMissoes = () => {
+  const { theme } = useContext(ThemeContext);
+  const styles = getStyles(theme);
+
   const [missions, setMissions] = useState<DailyMission[]>([]);
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -23,8 +27,8 @@ const TelaMissoes = () => {
   useEffect(() => {
     Animated.timing(progressAnim, {
       toValue: completedIds.length,
-      duration: 600, 
-      useNativeDriver: false, 
+      duration: 600,
+      useNativeDriver: false,
     }).start();
   }, [completedIds.length, progressAnim]);
 
@@ -165,7 +169,7 @@ const TelaMissoes = () => {
 
       if (newCompleted.length === 5) {
         setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 5000); 
+        setTimeout(() => setShowConfetti(false), 5000);
         
         Alert.alert('Parabéns! 🏆', 'Completou todas as missões do dia!');
         setRerollsLeft(0);
@@ -253,8 +257,13 @@ const TelaMissoes = () => {
             {item.description}
           </Text>
           <View style={styles.xpBadge}>
-            <FontAwesome5 name="star" size={12} color={isCompleted ? '#7F8C8D' : '#F39C12'} solid />
-            <Text style={[styles.xpBadgeText, isCompleted && { color: '#7F8C8D' }]}>
+            <FontAwesome5 
+              name="star" 
+              size={12} 
+              color={isCompleted ? theme.colors.textBody : theme.colors.warning} 
+              solid 
+            />
+            <Text style={[styles.xpBadgeText, isCompleted && { color: theme.colors.textBody }]}>
               +{item.xp} XP
             </Text>
           </View>
@@ -266,7 +275,7 @@ const TelaMissoes = () => {
           disabled={isCompleted || completedIds.length >= 5}
           activeOpacity={0.7}
         >
-          {isCompleted && <FontAwesome5 name="check" size={16} color="#FFFFFF" />}
+          {isCompleted && <FontAwesome5 name="check" size={16} color={theme.colors.surface} />}
         </TouchableOpacity>
       </View>
     );
@@ -275,7 +284,7 @@ const TelaMissoes = () => {
   if (isLoading && missions.length === 0) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#27AE60" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -321,7 +330,7 @@ const TelaMissoes = () => {
           disabled={rerollsLeft <= 0 || completedIds.length > 0}
           activeOpacity={0.8}
         >
-          <FontAwesome5 name="sync-alt" size={16} color="#FFFFFF" />
+          <FontAwesome5 name="sync-alt" size={16} color={theme.colors.surface} />
           <Text style={styles.actionButtonText}>Trocar Missões ({rerollsLeft})</Text>
         </TouchableOpacity>
 
