@@ -8,8 +8,9 @@ import {
   Platform 
 } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { StorageService, StorageKeys } from '../storage/StorageService';
-import { styles } from '../styles/screens/telaLoginStyles';
+import { getStyles } from '../styles/screens/telaLoginStyles';
 
 interface Props {
   navigation: any; 
@@ -17,6 +18,8 @@ interface Props {
 
 const telaLogin = ({ navigation }: Props) => {
   const { updateUser } = useContext(UserContext);
+  const { theme } = useContext(ThemeContext);  
+  const styles = getStyles(theme);
   
   const [idade, setIdade] = useState('');
   const [peso, setPeso] = useState('');
@@ -70,7 +73,7 @@ const telaLogin = ({ navigation }: Props) => {
             onChangeText={(text) => limiteCaractere(text, setIdade)}
             keyboardType="numeric"
             placeholder="Ex: 25"
-            placeholderTextColor="#A0A0A0"
+            placeholderTextColor={theme.colors.textMuted}
           />
         </View>
 
@@ -82,7 +85,7 @@ const telaLogin = ({ navigation }: Props) => {
             onChangeText={(text) => limiteCaractere(text, setPeso)}
             keyboardType="numeric"
             placeholder="Ex: 70.5"
-            placeholderTextColor="#A0A0A0"
+            placeholderTextColor={theme.colors.textMuted}
           />
         </View>
 
@@ -94,13 +97,13 @@ const telaLogin = ({ navigation }: Props) => {
             onChangeText={handleAlturaChange}
             keyboardType="numeric"
             placeholder="Ex: 1,75"
-            placeholderTextColor="#A0A0A0"
+            placeholderTextColor={theme.colors.textMuted}
           />
         </View>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.8}>
           <Text style={styles.buttonText}>Começar Jornada</Text>
         </TouchableOpacity>
       </View>
