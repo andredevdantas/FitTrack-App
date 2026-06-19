@@ -1,14 +1,17 @@
 import React, { useState, useContext, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, Image, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Image, Switch, Dimensions } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { BarChart } from 'react-native-chart-kit';
 import { DaysContext } from '../contexts/DaysContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { StreakService } from '../services/StreakService';
 import { DaysOfWeek } from '../types';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 import { getStyles } from '../styles/screens/telaPerfilStyles';
+
+const screenWidth = Dimensions.get("window").width;
 
 const TelaPerfil = () => {
   const { selectedDays, toggleDay } = useContext(DaysContext);
@@ -90,6 +93,28 @@ const TelaPerfil = () => {
       }
     ]);
   };
+  const chartData = {
+    labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+    datasets: [
+      {
+        data: [150, 300, 0, 450, 150, 0, 600]
+      }
+    ]
+  };
+
+  const chartConfig = {
+    backgroundGradientFrom: theme.colors.surface,
+    backgroundGradientTo: theme.colors.surface,
+    color: (opacity = 1) => theme.colors.primary,
+    labelColor: (opacity = 1) => theme.colors.textBody,
+    barPercentage: 0.5,
+    decimalPlaces: 0,
+    propsForBackgroundLines: {
+      strokeWidth: 1,
+      stroke: theme.colors.border,
+      strokeDasharray: "4",
+    },
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -138,6 +163,25 @@ const TelaPerfil = () => {
             <Text style={styles.statNumber}>{userStats.missions}</Text>
             <Text style={styles.statLabel}>Missões</Text>
           </View>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Desempenho Semanal (XP)</Text>
+        <View style={styles.chartContainer}>
+          <BarChart
+            data={chartData}
+            width={screenWidth - 70} 
+            height={220}
+            yAxisLabel=""
+            yAxisSuffix=""
+            chartConfig={chartConfig}
+            verticalLabelRotation={0}
+            fromZero={true}
+            showValuesOnTopOfBars={true}
+            withInnerLines={true}
+            style={{ borderRadius: 16 }}
+          />
         </View>
       </View>
 
