@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+
 export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
@@ -16,6 +17,24 @@ export const getStyles = (theme: any) => StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
+    position: 'relative',
+  },
+  themeToggleButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    zIndex: 10,
   },
   avatarContainer: {
     width: 100,

@@ -1,5 +1,5 @@
-import React, { useState, useContext, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert, Image, Switch, Dimensions } from 'react-native';
+import React, { useState, useContext, useCallback, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Image, Dimensions, Animated } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -18,6 +18,27 @@ const TelaPerfil = () => {
   const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
   const navigation = useNavigation<any>();
   const styles = getStyles(theme);
+
+  const themeAnim = useRef(new Animated.Value(isDarkMode ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(themeAnim, {
+      toValue: isDarkMode ? 1 : 0,
+      friction: 5,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  }, [isDarkMode]);
+
+  const spin = themeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const scale = themeAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 0.7, 1],
+  });
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [userStats, setUserStats] = useState({
@@ -93,6 +114,7 @@ const TelaPerfil = () => {
       }
     ]);
   };
+
   const chartData = {
     labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
     datasets: [
@@ -119,6 +141,21 @@ const TelaPerfil = () => {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.themeToggleButton} 
+          onPress={toggleTheme} 
+          activeOpacity={0.8}
+        >
+          <Animated.View style={{ transform: [{ rotate: spin }, { scale: scale }] }}>
+            <FontAwesome5 
+              name={isDarkMode ? 'moon' : 'sun'} 
+              size={20} 
+              color={isDarkMode ? '#F1C40F' : theme.colors.primary} 
+              solid 
+            />
+          </Animated.View>
+        </TouchableOpacity>
+
         <TouchableOpacity activeOpacity={0.8} onPress={handlePickImage}>
           <View style={styles.avatarContainer}>
             {profileImage ? (
@@ -171,7 +208,7 @@ const TelaPerfil = () => {
         <View style={styles.chartContainer}>
           <BarChart
             data={chartData}
-            width={screenWidth - 70} 
+            width={screenWidth - 70}
             height={220}
             yAxisLabel=""
             yAxisSuffix=""
@@ -182,21 +219,6 @@ const TelaPerfil = () => {
             withInnerLines={true}
             style={{ borderRadius: 16 }}
           />
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Configurações</Text>
-        <View style={styles.cardContainer}>
-          <View style={[styles.row, styles.rowLast]}>
-            <Text style={styles.rowText}>Modo Escuro</Text>
-            <Switch 
-              value={isDarkMode} 
-              onValueChange={toggleTheme}
-              trackColor={{ false: '#E5E8E8', true: theme.colors.primary }}
-              thumbColor={theme.colors.surface}
-            />
-          </View>
         </View>
       </View>
 
