@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { WorkoutService, DailyMission } from '../services/WorkoutService';
+import { StreakService } from '../services/StreakService';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { getStyles } from '../styles/screens/telaMissoesStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
@@ -66,7 +67,8 @@ const TelaMissoes = () => {
     try {
       setIsLoading(true);
       const nowTs = new Date().getTime();
-      
+      await StreakService.getStreak();
+
       const savedAdmin = await StorageService.getItem<boolean>(StorageKeys.IS_ADMIN_MODE);
       if (savedAdmin) setIsAdminMode(true);
 
@@ -171,7 +173,9 @@ const TelaMissoes = () => {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
         
-        Alert.alert('Parabéns! 🏆', 'Completou todas as missões do dia!');
+        const newStreak = await StreakService.recordActivity();
+        
+        Alert.alert('Parabéns! 🏆', `Completou todas as missões do dia!\n\n🔥 Ofensiva: ${newStreak} dia(s)`);
         setRerollsLeft(0);
         await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 0);
       }
