@@ -1,25 +1,28 @@
 # FitTrack - Monitoramento e Motivação para Exercícios 💪
 
-O **FitTrack** é um aplicativo de saúde e bem-estar projetado para ajudar os usuários a manterem a consistência em seus treinos. Desenvolvido com foco em retenção de usuários, o app utiliza um sistema robusto de gamificação (missões diárias, acúmulo de XP e medalhas) aliado a uma arquitetura moderna e reativa.
+O **FitTrack** é um aplicativo de saúde e bem-estar projetado para ajudar os usuários a manterem a consistência em seus treinos. Desenvolvido com foco em retenção de usuários, o app utiliza um sistema robusto de gamificação (missões diárias, acúmulo de XP, medalhas e ofensivas) aliado a uma arquitetura moderna e reativa.
 
 ---
 
 ## ✨ Funcionalidades de Destaque
 
 * **Arquitetura Offline-First:** Persistência total de dados locais utilizando o `AsyncStorage` como fonte única de verdade (Single Source of Truth), permitindo que o app funcione perfeitamente sem internet.
-* **Gamificação e Recompensas:** Sistema de missões diárias com reset cíclico automático (às 04:00 AM), acúmulo de XP, desbloqueio condicional de medalhas e micro-interações visuais (animações fluidas e explosão de confetes ao concluir metas).
-* **Design System Centralizado:** Utilização de um dicionário de tokens de design (`theme.ts`) que garante consistência visual em toda a interface e facilita a manutenção ou escalabilidade (como a implementação de um *Dark Mode*).
-* **Gerenciamento de Estado Reativo:** Sincronização em tempo real entre as abas do aplicativo utilizando `Context API` e o hook `useFocusEffect` do React Navigation.
+* **Gamificação e Retenção:** Sistema de missões diárias com reset cíclico automático, acúmulo de XP, desbloqueio condicional de medalhas e um sistema de **Ofensivas (Streaks)** que recompensa a consistência.
+* **Notificações Push Locais:** Lembretes diários automatizados para ajudar o usuário a não perder a sua ofensiva, utilizando agendamento nativo do sistema operacional.
+* **Acompanhamento de Desempenho:** Visualização do progresso através de gráficos interativos de volumetria semanal de XP.
+* **Dark Mode Dinâmico e Design System:** Utilização de um dicionário de tokens de design que garante consistência visual e permite a alternância fluida e animada entre os temas Claro e Escuro, totalmente gerenciada por Context API.
+* **Micro-interações:** UX responsiva com animações baseadas em física (React Native Animated) e feedback visual gamificado (como explosões de confetes ao concluir metas).
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-* **React Native & Expo (SDK 54):** Framework principal para desenvolvimento mobile multiplataforma.
-* **TypeScript:** Tipagem estática rigorosa para garantir segurança, previsibilidade e um código à prova de falhas de tipagem.
+* **React Native & Expo:** Framework principal para desenvolvimento mobile multiplataforma.
+* **TypeScript:** Tipagem estática rigorosa para garantir segurança, previsibilidade e um código à prova de falhas.
 * **React Navigation:** Navegação nativa e fluida utilizando Native Stack e Bottom Tabs.
 * **Context API:** Gerenciamento de estado global descentralizado e limpo (dispensando bibliotecas externas como Redux).
-* **React Native Animated & Confetti Cannon:** Criação de UX responsiva, micro-interações e feedback visual gamificado.
+* **Expo Notifications:** Integração direta com a API de Push Notifications nativa dos dispositivos.
+* **React Native Chart Kit:** Renderização de gráficos vetoriais (SVG) para análise de desempenho.
 
 ---
 
@@ -28,18 +31,21 @@ O **FitTrack** é um aplicativo de saúde e bem-estar projetado para ajudar os u
 O projeto segue uma rigorosa separação de responsabilidades para manter o código escalável e de fácil manutenção:
 
 ```
-src/
-├── assets/         # Imagens, ícones e fontes da aplicação
-├── components/     # Componentes de UI reutilizáveis (Cards, Buttons, etc)
-├── contexts/       # Gerenciamento de Estado Global
-├── hooks/          # Hooks customizados para lógica encapsulada
-├── navigation/     # Configuração de rotas da aplicação
-├── screens/        # Telas da aplicação (focadas apenas na lógica e renderização)
-├── services/       # Lógicas de negócio, Mocks e chamadas externas
-├── storage/        # Implementação centralizada do AsyncStorage
-├── styles/         # Arquivos de estilização isolados por escopo e Design System
-├── types/          # Definições de interfaces do TypeScript
-└── utils/          # Funções utilitárias e formatações
+FitTrack-App/
+├── assets/         # Identidade visual, logotipos, splash screen e ícones nativos
+├── src/
+│   ├── components/ # Componentes de UI reutilizáveis (Cards, Buttons, etc)
+│   ├── contexts/   # Gerenciamento de Estado Global (Theme, Days, User)
+│   ├── hooks/      # Hooks customizados para lógica encapsulada
+│   ├── navigation/ # Configuração de rotas e Tab Navigators
+│   ├── screens/    # Telas da aplicação (focadas apenas na renderização)
+│   ├── services/   # Serviços isolados (WorkoutService, StreakService, NotificationService)
+│   ├── storage/    # Implementação centralizada e estruturada do AsyncStorage
+│   ├── styles/     # Arquivos de estilização dinâmicos e adaptáveis ao tema
+│   ├── types/      # Definições de interfaces do TypeScript
+│   └── utils/      # Funções utilitárias e de formatação
+├── app.json        # Configurações do app, manifestos e permissões do Expo
+└── package.json    # Dependências e scripts do projeto
 ```
 
 ## 💻 Como rodar o projeto localmente
@@ -65,6 +71,9 @@ src/
 ```
     
 5. Leia o QR Code com o aplicativo Expo Go (Android/iOS) ou pressione a para abrir no emulador Android.
+
+* **Aviso de Ambiente:** Devido à implementação de expo-notifications, a visualização das notificações push em tempo real exige que a aplicação seja compilada através do EAS (Expo Application Services) ou utilizando o cliente expo-dev-client, pois o suporte a push notifications remotas foi descontinuado no app padrão do Expo Go.
+
 ---
 
 ## 👨‍💻 Autor
