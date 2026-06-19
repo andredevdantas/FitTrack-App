@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Routes } from './src/navigation/Routes';
 import { UserProvider } from './src/contexts/UserContext';
 import { DaysProvider } from './src/contexts/DaysContext';
 import { ThemeProvider } from './src/contexts/ThemeContext';
+import { NotificationService } from './src/services/NotificationService';
 
 export default function App() {
+  
+  useEffect(() => {
+    const initNotifications = async () => {
+      const hasPermission = await NotificationService.requestPermissions();
+      
+      if (hasPermission) {
+        await NotificationService.scheduleDailyReminder();
+      }
+    };
+    initNotifications();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>
