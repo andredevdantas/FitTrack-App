@@ -5,6 +5,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { DaysContext } from '../contexts/DaysContext';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { StreakService } from '../services/StreakService';
 import { DaysOfWeek } from '../types';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 import { getStyles } from '../styles/screens/telaPerfilStyles';
@@ -20,6 +21,7 @@ const TelaPerfil = () => {
     xp: 0,
     missions: 0,
     workouts: 0,
+    streak: 0,
   });
 
   const loadData = async () => {
@@ -27,7 +29,9 @@ const TelaPerfil = () => {
       const xp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
       const missions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
       const workouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
-      setUserStats({ xp, missions, workouts });
+      const streak = await StreakService.getStreak();
+      
+      setUserStats({ xp, missions, workouts, streak });
 
       const savedImage = await StorageService.getItem<string>(StorageKeys.USER_PROFILE_IMAGE);
       if (savedImage) setProfileImage(savedImage);
@@ -105,6 +109,19 @@ const TelaPerfil = () => {
         
         <Text style={styles.userName}>Atleta FitTrack</Text>
         <Text style={styles.userEmail}>focado@fittrack.app</Text>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: `${theme.colors.warning}20`,
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          borderRadius: 16,
+          marginTop: 12,
+        }}>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: theme.colors.warning }}>
+            🔥 {userStats.streak} {userStats.streak === 1 ? 'dia' : 'dias'} de ofensiva
+          </Text>
+        </View>
 
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
