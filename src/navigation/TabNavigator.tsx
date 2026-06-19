@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MainTabParamList } from '../types';
+import { ThemeContext } from '../contexts/ThemeContext';
 
 import telaPrincipal from '../screens/telaPrincipal';
 import telaMedalhas from '../screens/telaMedalhas';
 import telaMissoes from '../screens/telaMissoes';
 import telaPerfil from '../screens/telaPerfil';
-import { styles, tabBarColors } from '../styles/navigation/TabNavigatorStyles';
+import { getStyles, getTabBarColors } from '../styles/navigation/TabNavigatorStyles';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function TabNavigator() {
   const insets = useSafeAreaInsets();
+  const { theme } = useContext(ThemeContext);
+  
+  const styles = getStyles(theme);
+  const tabBarColors = getTabBarColors(theme);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
