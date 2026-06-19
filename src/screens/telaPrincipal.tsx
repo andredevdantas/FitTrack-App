@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { WorkoutService, Exercise } from '../services/WorkoutService';
+import { StreakService } from '../services/StreakService';
 import { DaysContext } from '../contexts/DaysContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { DaysOfWeek } from '../types';
@@ -49,6 +50,7 @@ const TelaPrincipal = () => {
       setIsLoading(true);
       const today = getCurrentDayKey();
       setCurrentDay(today);
+      await StreakService.getStreak();
 
       const weeklyPlan = await WorkoutService.fetchWeeklyPlan();
 
@@ -119,7 +121,9 @@ const TelaPrincipal = () => {
     const currentTotalXp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
     await StorageService.setItem(StorageKeys.USER_TOTAL_XP, currentTotalXp + 150);
 
-    Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso e ganhou +150 XP!`);
+    const newStreak = await StreakService.recordActivity();
+
+    Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso e ganhou +150 XP!\n\n🔥 Ofensiva: ${newStreak} dia(s)`);
   }, [currentDay, completionStatus]);
 
   const renderWorkoutCard = ({ item }: { item: DayWorkout }) => {

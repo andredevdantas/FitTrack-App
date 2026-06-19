@@ -20,6 +20,9 @@ export const StorageKeys = {
   TOTAL_WORKOUTS_COMPLETED: '@FitTrack:totalWorkoutsCompleted',
   IS_ADMIN_MODE: '@FitTrack:isAdminMode',
   USER_PROFILE_IMAGE: '@FitTrack:userProfileImage',
+
+  STREAK_COUNT: '@FitTrack:streakCount',
+  STREAK_LAST_DATE: '@FitTrack:streakLastDate',
 };
 
 export const StorageService = {
