@@ -2,26 +2,30 @@
   "expo": {
     "name": "FitTrack",
     "slug": "fittrack",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/FitTrack.png",
+    "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "./assets/FitTrack-Splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#27AE60" 
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/FitTrack-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.andredantas.fittrack"
     },
     "web": {
-      "favicon": "./src/assets/favicon.png"
+      "favicon": "./assets/FitTrack.png"
     }
   }
 }
