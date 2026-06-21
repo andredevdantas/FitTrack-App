@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/FitTrack-Splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#27AE60" 
+      "backgroundColor": "#27AE60"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -26,6 +26,11 @@
     },
     "web": {
       "favicon": "./assets/FitTrack.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1a59b869-f42e-4c8b-b76a-62f1088982f6"
+      }
     }
   }
 }
