@@ -1,13 +1,45 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  xp        Int      @default(0)
+  
+  // Relacionamentos
+  workouts  Workout[] // Um usuário pode ter varios treinos
+  streak    Streak? // Um usuário tem uma ofensiva
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Workout {
+  id          String   @id @default(uuid())
+  title       String
+  durationMin Int     
+  xpAwarded   Int
+  date        DateTime @default(now())
+
+  // Relacionamento
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Streak {
+  id            String   @id @default(uuid())
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastActive    DateTime @default(now())
+
+  // Relacionamento
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
 }
