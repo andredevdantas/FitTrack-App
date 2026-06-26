@@ -6,7 +6,7 @@ const workoutService = new WorkoutService();
 export class WorkoutController {
   async finishWorkout(req: Request, res: Response) {
     try {
-      const { userId } = req.params;
+      const userId = req.params.userId as string;
       const { title, durationMin, xpAwarded } = req.body;
 
       if (!title || !durationMin || !xpAwarded) {
