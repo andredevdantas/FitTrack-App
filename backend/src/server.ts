@@ -1,27 +1,20 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-
-// Carrega as variáveis de ambiente do ficheiro .env
-dotenv.config();
+import userRoutes from './routes/userRoutes';
+import workoutRoutes from './routes/workoutRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
 app.use(cors());
-app.use(express.json()); 
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({
-    message: '🚀 API do FitTrack rodando com sucesso!',
-    status: 'online',
-    version: '1.0.0'
-  });
+app.use('/users', userRoutes);
+app.use('/workouts', workoutRoutes);
+app.get('/ping', (req, res) => {
+  res.json({ message: 'O servidor FitTrack está online e funcionando.' });
 });
 
 app.listen(PORT, () => {
-  console.log(`\n==============================================`);
-  console.log(`Servidor online em: http://localhost:${PORT}`);
-  console.log(`==============================================\n`);
+  console.log(`Servidor rodando na porta: ${PORT}`);
 });
