@@ -80,7 +80,7 @@ const TelaLogin = ({ navigation }: Props) => {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <TouchableOpacity 
-          style={styles.button} 
+          style={[styles.button, isLoading && styles.buttonDisabled]} 
           onPress={handleLogin} 
           activeOpacity={0.8}
           disabled={isLoading}

@@ -55,6 +55,9 @@ export const getStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
     marginTop: 24,
   },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
   buttonText: {
     color: theme.colors.surface,
     fontSize: 16,
