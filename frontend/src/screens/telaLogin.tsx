@@ -16,7 +16,7 @@ interface Props {
   navigation: any; 
 }
 
-const telaLogin = ({ navigation }: Props) => {
+const TelaLogin = ({ navigation }: Props) => {
   const { updateUser } = useContext(UserContext);
   const { theme } = useContext(ThemeContext);  
   const styles = getStyles(theme);
@@ -111,4 +111,4 @@ const telaLogin = ({ navigation }: Props) => {
   );
 };
 
-export default telaLogin;
+export default TelaLogin;
