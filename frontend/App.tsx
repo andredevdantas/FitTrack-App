@@ -6,6 +6,7 @@ import { UserProvider } from './src/contexts/UserContext';
 import { DaysProvider } from './src/contexts/DaysContext';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 import { NotificationService } from './src/services/NotificationService';
+import { api } from './src/services/api';
 
 export default function App() {
   
@@ -18,6 +19,15 @@ export default function App() {
       }
     };
     initNotifications();
+    const testConnection = async () => {
+      try {
+        const response = await api.get('/ping');
+        console.log('CONEXÃO BEM-SUCEDIDA! O backend respondeu:', response.data.message);
+      } catch (error: any) {
+        console.error('ERRO DE CONEXÃO COM A API:', error.message);
+      }
+    };
+    testConnection();
   }, []);
 
   return (
