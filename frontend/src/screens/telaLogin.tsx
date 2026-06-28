@@ -5,7 +5,8 @@ import {
   TextInput, 
   TouchableOpacity, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform,
+  ActivityIndicator
 } from 'react-native';
 import { UserContext } from '../contexts/UserContext';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -17,43 +18,29 @@ interface Props {
 }
 
 const TelaLogin = ({ navigation }: Props) => {
-  const { updateUser } = useContext(UserContext);
+  const { register, isLoading } = useContext(UserContext);
   const { theme } = useContext(ThemeContext);  
   const styles = getStyles(theme);
   
-  const [idade, setIdade] = useState('');
-  const [peso, setPeso] = useState('');
-  const [altura, setAltura] = useState('');
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
 
-  const limiteCaractere = (text: string, setAttribute: React.Dispatch<React.SetStateAction<string>>) => {
-    if (text.length > 4) {
-      setAttribute(text.slice(0, 4));
-    } else {
-      setAttribute(text);
-    }
-  };
-
-  const handleAlturaChange = (text: string) => {
-    let newText = text;
-    if (newText.length === 2 && !newText.includes(',')) {
-      newText = `${newText.slice(0, 1)},${newText.slice(1)}`;
-    }
-    limiteCaractere(newText, setAltura);
-  };
-
   const handleLogin = async () => {
-    if (!idade || !peso || !altura) {
+    if (!nome.trim() || !email.trim()) {
       setError('Por favor, preencha todos os campos.');
       return;
     }
 
     setError('');
     
-    await updateUser({ idade, peso, altura });
-    await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
-    
-    navigation.navigate('MainTabs');
+    try {
+      await register(nome, email);
+      await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
+      navigation.navigate('MainTabs');
+    } catch (err: any) {
+      setError('Erro ao conectar com o servidor. Tente novamente.');
+    }
   };
 
   return (
@@ -63,48 +50,46 @@ const TelaLogin = ({ navigation }: Props) => {
     >
       <View style={styles.card}>
         <Text style={styles.title}>Bem-vindo ao FitTrack</Text>
-        <Text style={styles.subtitle}>Configure seu perfil para começar</Text>
+        <Text style={styles.subtitle}>Crie sua conta para sincronizar seu progresso</Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Idade</Text>
+          <Text style={styles.label}>Nome de Herói</Text>
           <TextInput
             style={styles.input}
-            value={idade}
-            onChangeText={(text) => limiteCaractere(text, setIdade)}
-            keyboardType="numeric"
-            placeholder="Ex: 25"
+            value={nome}
+            onChangeText={setNome}
+            placeholder="Ex: Arthur Pendragon"
             placeholderTextColor={theme.colors.textMuted}
+            autoCapitalize="words"
           />
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Peso (kg)</Text>
+          <Text style={styles.label}>E-mail</Text>
           <TextInput
             style={styles.input}
-            value={peso}
-            onChangeText={(text) => limiteCaractere(text, setPeso)}
-            keyboardType="numeric"
-            placeholder="Ex: 70.5"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            placeholder="Ex: heroi@fittrack.com"
             placeholderTextColor={theme.colors.textMuted}
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Altura (m)</Text>
-          <TextInput
-            style={styles.input}
-            value={altura}
-            onChangeText={handleAlturaChange}
-            keyboardType="numeric"
-            placeholder="Ex: 1,75"
-            placeholderTextColor={theme.colors.textMuted}
+            autoCapitalize="none"
           />
         </View>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Começar Jornada</Text>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={handleLogin} 
+          activeOpacity={0.8}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Começar Jornada</Text>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
