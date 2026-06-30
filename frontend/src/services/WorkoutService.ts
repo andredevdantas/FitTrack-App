@@ -1,4 +1,5 @@
 import { DaysOfWeek } from '../types';
+import { api } from './api';
 
 export interface Exercise {
   id: string;
@@ -95,5 +96,19 @@ export const WorkoutService = {
   async fetchMedals(): Promise<Medal[]> {
     await delay(500);
     return MOCK_MEDALS;
+  },
+
+  async finishWorkoutAPI(userId: string, title: string, durationMin: number, xpAwarded: number) {
+    try {
+      const response = await api.post(`/workouts/${userId}/finish`, {
+        title,
+        durationMin,
+        xpAwarded
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Erro ao salvar treino na nuvem:', error.response?.data || error.message);
+      throw error;
+    }
   }
 };
