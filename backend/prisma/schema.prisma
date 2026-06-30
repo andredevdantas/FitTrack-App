@@ -43,3 +43,35 @@ model Streak {
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id])
 }
+
+model Exercise {
+  id        String   @id @default(uuid())
+  name      String
+  details   String
+  dayOfWeek String
+  createdAt DateTime @default(now())
+
+  @@map("exercises")
+}
+
+model DailyMission {
+  id          String   @id @default(uuid())
+  description String
+  xp          Int
+  createdAt   DateTime @default(now())
+
+  @@map("daily_missions")
+}
+
+model Medal {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  type        String
+  requirement Int
+  icon        String
+  color       String
+  createdAt   DateTime @default(now())
+
+  @@map("medals")
+}
