@@ -1,32 +1,29 @@
 # FitTrack - Monitoramento e Motivação para Exercícios 💪
 
-O **FitTrack** é um aplicativo completo de saúde e bem-estar projetado para ajudar os usuários a manterem a consistência em seus treinos. Desenvolvido com foco absoluto em retenção, o sistema utiliza um motor robusto de gamificação (missões diárias, acúmulo de XP, medalhas e ofensivas) aliado a uma arquitetura moderna Full-Stack.
+> O **FitTrack** é um aplicativo completo de saúde e bem-estar projetado para ajudar os usuários a manterem a consistência em seus treinos. Desenvolvido com foco absoluto em retenção, o sistema utiliza um motor robusto de gamificação (missões diárias, acúmulo de XP, medalhas e ofensivas) aliado a uma arquitetura moderna Full-Stack orientada a dados.
 
 ---
 
 ## ✨ Funcionalidades de Destaque
 
-* **Arquitetura Full-Stack (Monorepo):** Divisão inteligente entre o cliente mobile (Frontend) e a API na nuvem (Backend) dentro do mesmo repositório, garantindo padronização e escalabilidade de código.
-* **Gamificação e Retenção:** Sistema de missões diárias com reset cíclico automático, acúmulo de XP, e um sistema de **Ofensivas (Streaks)** que recompensa a consistência do usuário.
+* **Integração Full-Stack Real-Time:** Sincronização de progresso e ofensivas (Streaks) diretamente na nuvem (PostgreSQL). O usuário não perde os dados ao trocar de celular.
+* **Motor de Gamificação Dinâmico:** Catálogo de missões, exercícios e medalhas servidos dinamicamente pela API REST, permitindo atualizações do sistema sem necessidade de o usuário baixar novas versões na loja.
 * **Notificações Push Locais:** Lembretes diários automatizados para ajudar o usuário a não perder a sua ofensiva, utilizando agendamento nativo do sistema operacional.
 * **Acompanhamento de Desempenho:** Visualização do progresso através de gráficos interativos de volumetria semanal de XP.
-* **Dark Mode Dinâmico e Design System:** Utilização de um dicionário de tokens de design que garante consistência visual e permite a alternância fluida entre os temas Claro e Escuro (Context API).
+* **UI/UX com Tema Dinâmico:** Utilização de um dicionário de tokens de design que garante consistência visual e permite a alternância fluida entre os temas Claro e Escuro.
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## 🏗️ Arquitetura do Sistema
 
-### Frontend (Mobile)
-* **React Native & Expo:** Framework principal para desenvolvimento mobile multiplataforma.
-* **TypeScript:** Tipagem estática rigorosa para segurança e previsibilidade.
-* **Context API & React Navigation:** Gerenciamento de estado global e rotas nativas fluidas.
-* **Expo Notifications & Chart Kit:** Integração nativa de lembretes e renderização de gráficos vetoriais (SVG).
+O projeto adota o padrão **Monorepo**, garantindo a separação estrita de responsabilidades entre o cliente mobile e a API na nuvem.
 
-### Backend (API)
-* **Node.js & Express:** Motor de execução e framework de roteamento rápido para a API REST.
-* **TypeScript:** Compartilhamento do mesmo ecossistema de tipagem do frontend.
-* **Prisma ORM:** Ferramenta moderna e tipada para comunicação segura com o banco de dados.
-* **PostgreSQL (Neon.tech):** Banco de dados relacional hospedado na nuvem para persistência em tempo real.
+```
+┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│     Frontend     │───>│   Backend API    │───>│    PostgreSQL    │
+│ (React Native)   │    │ (Node.js/Express)│    │   (Prisma ORM)   │
+└──────────────────┘    └──────────────────┘    └──────────────────┘
+```
 
 ---
 
@@ -35,30 +32,102 @@ O **FitTrack** é um aplicativo completo de saúde e bem-estar projetado para aj
 O projeto foi refatorado para um padrão **Monorepo**, garantindo a separação estrita de responsabilidades:
 
 ```
-FitTrack/
-├── frontend/             # Aplicação Mobile
-│   ├── assets/           # Identidade visual e ícones nativos
+FitTrack-App/
+├── frontend/              # Aplicação Mobile
 │   ├── src/
-│   │   ├── components/   # Componentes de UI reutilizáveis (SOLID)
-│   │   ├── contexts/     # Estado Global (Theme, Days, User)
-│   │   ├── screens/      # Telas focadas na renderização
-│   │   ├── services/     # Regras locais e armazenamento
-│   │   └── styles/       # Tokens de design e temas
-│   └── app.json          # Manifestos do Expo
+│   │   ├── components/    # Componentes de UI reutilizáveis
+│   │   ├── contexts/      # Estado global integrado à API
+│   │   ├── screens/       # Telas e renderização
+│   │   ├── services/      # Cliente HTTP (Axios) e Storage local
+│   │   └── styles/        # Tokens de design (Dark/Light mode)
+│   └── .env.example       # Molde de configuração de IP
 │
-└── backend/              # API REST (Arquitetura MSC)
-    ├── prisma/           # Schema do banco de dados e migrações (SQL)
+└── backend/               # API REST
+    ├── prisma/            # Banco de Dados
+    │   ├── schema.prisma  # Modelagem de entidades relacionais
+    │   └── seed.ts        # Script de população do catálogo
     ├── src/
-    │   ├── controllers/  # Gerenciamento de requisições e respostas HTTP
-    │   ├── services/     # Cérebro da API: regras de negócio e validações
-    │   ├── routes/       # Definição dos endpoints da API
-    │   └── server.ts     # Ponto de entrada do servidor
-    └── .env              # Variáveis de ambiente (Segurança)
+    │   ├── controllers/   # Interceptadores e respostas HTTP
+    │   ├── services/      # Regras de negócio e consultas (Prisma)
+    │   ├── routes/        # Mapeamento de endpoints
+    │   └── server.ts      # Ponto de entrada do servidor
+    └── prisma.config.ts   # Configurações do ORM v7
 ```
+
+---
+
+## 📦 Módulos da API
+
+| Módulo | Descrição |
+|--------|-----------|
+| `users` | Criação de contas, autenticação e sincronização de progresso |
+| `workouts` | Registro de conclusão de exercícios, cálculo de XP e ofensivas |
+| `catalog` | Fornecimento dinâmico de exercícios, missões diárias e medalhas |
+| `notifications` | Agendamento de lembretes locais via motor do sistema operacional |
+
+---
+
+## 🗄️ Modelagem do Banco de Dados
+
+O banco de dados relacional foi estruturado para suportar o Core Loop de gamificação e manter um catálogo escalável e dinâmico.
+
+```
+USER (Usuários)
+├── id, name, email, password
+├── xp, level (Métricas de Gamificação)
+│
+WORKOUT (Histórico de Treinos)
+├── userId (Foreign Key) -> Pertence ao User
+├── title, durationMin, xpAwarded, createdAt
+│
+STREAK (Ofensivas)
+├── userId (Foreign Key) -> Pertence ao User
+├── currentStreak, maxStreak, lastWorkoutDate
+│
+EXERCISE (Catálogo de Exercícios)
+├── id, name, details, dayOfWeek
+│
+DAILY_MISSION (Catálogo de Missões)
+├── id, description, xp
+│
+MEDAL (Catálogo de Medalhas)
+└── id, name, description, requirement, icon, color
+
+```
+
+---
+
+## 🔧 Variáveis de Ambiente
+
+Para o funcionamento correto em desenvolvimento, configure as seguintes chaves nos arquivos .env respectivos:
+
+| Variável | Local | Descrição |
+|----------|-----------|-----------|
+| `DATABASE_URL` | /backend/.env | String de conexão do PostgreSQL (Ex: Neon.tech) |
+| `EXPO_PUBLIC_API_URL` | /frontend/.env | IP local + Porta para comunicação do Axios |
+
+---
+
+## 🚀 Tecnologias Utilizadas
+
+### Frontend (Mobile)
+* **React Native & Expo:** Framework principal para desenvolvimento multiplataforma.
+* **TypeScript:** Tipagem estática rigorosa e cliente HTTP centralizado.
+* **Context API & React Navigation:** Gerenciamento de estado global e rotas nativas fluidas.
+* **Expo Notifications & Chart Kit:** Integração nativa de lembretes e renderização de gráficos vetoriais (SVG).
+
+### Backend (API)
+* **Node.js & Express:** Motor de execução e framework de roteamento rápido para a API REST.
+* **TypeScript:** Compartilhamento do mesmo ecossistema de tipagem do frontend.
+* **PostgreSQL (Neon):** Banco de dados relacional Serverless.
+* **Prisma ORM (v7):** Conexão robusta via adapters nativos (pg e @prisma/adapter-pg).
+* **SX & CORS:** Motor de execução para desenvolvimento com Hot-Reload e permissões cross-origin.
+
+---
 
 ## 💻 Como rodar o projeto localmente
 
-Como o projeto agora é um Monorepo, você precisará iniciar o banco de dados/servidor e o aplicativo simultaneamente.
+Como o projeto é um Monorepo, você precisará iniciar a API e o Aplicativo em abas separadas do terminal.
 
 1. Clone este repositório:
 ```
@@ -72,34 +141,33 @@ Abra um terminal, acesse a pasta do backend e instale as dependências:
    npm install
 ```
 
-- Crie um arquivo .env na pasta backend com a sua URL do banco de dados PostgreSQL (DATABASE_URL).
-  
-
-- Execute as migrações para gerar as tabelas no seu banco:
+* Crie um arquivo .env na pasta backend e adicione a variável DATABASE_URL.
+* Crie as tabelas e popule o banco de dados inicial:
   
 ```
-npx prisma migrate dev
+npx prisma db push
+npx prisma db seed
 ```
 
-- Inicie o servidor: 
+* Inicie o servidor em modo desenvolvimento:: 
 ```
 npm run dev
 ```
    
-3. Configuração do Frontend (Mobile):
+3. Configuração e Execução do Frontend (Mobile):
 Abra uma nova aba no terminal, acesse a pasta do frontend e instale as dependências:
 ```
    cd frontend
    npm install
 ```
+* Crie um arquivo .env copiando o modelo .env.example e insira o IP da sua rede local.
 
 4. Inicie o servidor do Expo:
+Inicie o servidor do Expo limpando o cache:
 ```
-   npx expo start
+   npx expo start --clear
 ```
-
-- Leia o QR Code com o aplicativo Expo Go (Android/iOS) ou pressione a para abrir no emulador Android.
-  
+* Leia o QR Code com o aplicativo Expo Go (Android/iOS) ou pressione a para abrir no emulador Android.
 
 * **Aviso de Ambiente:** Devido à implementação de expo-notifications, a visualização das notificações push em tempo real exige que a aplicação seja compilada através do EAS (Expo Application Services) ou utilizando o cliente expo-dev-client, pois o suporte a push notifications remotas foi descontinuado no app padrão do Expo Go.
 
