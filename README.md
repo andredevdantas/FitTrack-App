@@ -2,6 +2,26 @@
 
 > O **FitTrack** é um aplicativo completo de saúde e bem-estar projetado para ajudar os usuários a manterem a consistência em seus treinos. Desenvolvido com foco absoluto em retenção, o sistema utiliza um motor robusto de gamificação (missões diárias, acúmulo de XP, medalhas e ofensivas) aliado a uma arquitetura moderna Full-Stack orientada a dados.
 
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+
+---
+
+## 📋 Índice
+
+* [Funcionalidades de Destaque](#-funcionalidades-de-destaque)
+* [Arquitetura do Sistema](#-arquitetura-do-sistema)
+* [Estrutura Arquitetural](#-estrutura-arquitetural)
+* [Módulos da API](#-módulos-da-api)
+* [Modelagem do Banco de Dados](#-modelagem-do-banco-de-dados)
+* [Variáveis de Ambiente](#-variáveis-de-ambiente)
+* [Tecnologias Utilizadas](#-tecnologias-utilizadas)
+* [Como rodar o projeto localmente](#-como-rodar-o-projeto-localmente)
+* [Autor](#-autor)
+
 ---
 
 ## ✨ Funcionalidades de Destaque
@@ -14,7 +34,7 @@
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+## 🧱 Arquitetura do Sistema
 
 O projeto adota o padrão **Monorepo**, garantindo a separação estrita de responsabilidades entre o cliente mobile e a API na nuvem.
 
@@ -67,7 +87,7 @@ FitTrack-App/
 
 ---
 
-## 🗄️ Modelagem do Banco de Dados
+## 💾 Modelagem do Banco de Dados
 
 O banco de dados relacional foi estruturado para suportar o Core Loop de gamificação e manter um catálogo escalável e dinâmico.
 
@@ -173,5 +193,5 @@ Inicie o servidor do Expo limpando o cache:
 
 ---
 
-## 👨‍💻 Autor
+## 👤 Autor
 Desenvolvido por André Luis.
