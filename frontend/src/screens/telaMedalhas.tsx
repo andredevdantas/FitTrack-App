@@ -4,11 +4,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutService, Medal } from '../services/WorkoutService';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { UserContext } from '../contexts/UserContext';
 import { getStyles } from '../styles/screens/telaMedalhasStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
 const TelaMedalhas = () => {
   const { theme } = useContext(ThemeContext);
+  const { user } = useContext(UserContext);
   const styles = getStyles(theme);
 
   const [medals, setMedals] = useState<Medal[]>([]);
@@ -28,9 +30,9 @@ const TelaMedalhas = () => {
       const adminMode = await StorageService.getItem<boolean>(StorageKeys.IS_ADMIN_MODE);
       setIsAdmin(adminMode || false);
 
-      const xp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
       const missions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
       const workouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
+      const xp = (user as any)?.xp || 0;
       
       setUserStats({ xp, missions, workouts });
 
@@ -46,29 +48,29 @@ const TelaMedalhas = () => {
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [])
+    }, [user])
   );
 
   const addDemoXP = async () => {
-    const newXp = userStats.xp + 100;
-    await StorageService.setItem(StorageKeys.USER_TOTAL_XP, newXp);
-    setUserStats(prev => ({ ...prev, xp: newXp }));
+    Alert.alert(
+      'Modo Admin', 
+      'Como o XP agora é controlado pelo servidor (nuvem), o botão de adicionar XP de demonstração precisaria de uma rota específica na API. Para testar o desbloqueio real, complete um treino ou missão!'
+    );
   };
 
   const handleResetStats = () => {
     Alert.alert(
       'Reset Global',
-      'Isto irá zerar todo o seu XP acumulado, treinos e missões globais. As medalhas bloqueadas voltarão ao estado original. Tem certeza?',
+      'Isto irá zerar as contagens locais de treinos e missões. (O XP real no servidor não será afetado). Tem certeza?',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Zerar Tudo',
+          text: 'Zerar Local',
           style: 'destructive',
           onPress: async () => {
-            await StorageService.setItem(StorageKeys.USER_TOTAL_XP, 0);
             await StorageService.setItem(StorageKeys.TOTAL_MISSIONS_COMPLETED, 0);
             await StorageService.setItem(StorageKeys.TOTAL_WORKOUTS_COMPLETED, 0);
-            setUserStats({ xp: 0, missions: 0, workouts: 0 });
+            setUserStats(prev => ({ ...prev, missions: 0, workouts: 0 }));
           }
         }
       ]
@@ -78,15 +80,16 @@ const TelaMedalhas = () => {
   const renderMedalCard = ({ item }: { item: Medal }) => {
     let isUnlocked = false;
     let progressText = '';
+    
     if (item.type === 'xp') {
       isUnlocked = userStats.xp >= item.requirement;
-      progressText = `Faltam ${item.requirement - userStats.xp} XP`;
+      progressText = `Faltam ${Math.max(0, item.requirement - userStats.xp)} XP`;
     } else if (item.type === 'missions') {
       isUnlocked = userStats.missions >= item.requirement;
-      progressText = `Faltam ${item.requirement - userStats.missions} missões`;
+      progressText = `Faltam ${Math.max(0, item.requirement - userStats.missions)} missões`;
     } else if (item.type === 'workouts') {
       isUnlocked = userStats.workouts >= item.requirement;
-      progressText = `Faltam ${item.requirement - userStats.workouts} treinos`;
+      progressText = `Faltam ${Math.max(0, item.requirement - userStats.workouts)} treinos`;
     }
 
     return (
@@ -147,7 +150,7 @@ const TelaMedalhas = () => {
         )}
 
         <View style={styles.statsCard}>
-          <Text style={styles.statsLabel}>XP Total Acumulado</Text>
+          <Text style={styles.statsLabel}>XP Total Acumulado (Nuveem)</Text>
           <Text style={styles.statsValue}>{userStats.xp} XP</Text>
         </View>
       </View>
