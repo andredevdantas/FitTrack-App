@@ -57,7 +57,7 @@ const TelaPerfil = () => {
       const localStreak = await StreakService.getStreak();
       
       setUserStats({ 
-        xp: user?.xp || 0, 
+        xp: (user as any)?.xp || 0, 
         missions, 
         workouts, 
         streak: (user as any)?.streak?.currentStreak ?? localStreak 
@@ -175,8 +175,8 @@ const TelaPerfil = () => {
           </View>
         </TouchableOpacity>
         
-        <Text style={styles.userName}>{user?.name || 'Atleta FitTrack'}</Text>
-        <Text style={styles.userEmail}>{user?.email || 'email@fittrack.app'}</Text>
+        <Text style={styles.userName}>{(user as any)?.name || 'Atleta FitTrack'}</Text>
+        <Text style={styles.userEmail}>{(user as any)?.email || 'email@fittrack.app'}</Text>
         
         <View style={{
           flexDirection: 'row',
