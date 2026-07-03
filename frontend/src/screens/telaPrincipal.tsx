@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { WorkoutService, Exercise } from '../services/WorkoutService';
-import { StreakService } from '../services/StreakService';
+import { UserContext } from '../contexts/UserContext'; 
 import { DaysContext } from '../contexts/DaysContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { DaysOfWeek } from '../types';
@@ -20,12 +20,14 @@ interface DayWorkout {
 const TelaPrincipal = () => {
   const { selectedDays } = useContext(DaysContext);
   const { theme } = useContext(ThemeContext);
+  const { user, fetchProgress } = useContext(UserContext);
   const styles = getStyles(theme);
 
   const [workouts, setWorkouts] = useState<DayWorkout[]>([]);
   const [currentDay, setCurrentDay] = useState<keyof DaysOfWeek>('segunda');
   const [completionStatus, setCompletionStatus] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isFinishing, setIsFinishing] = useState<boolean>(false);
 
   const formatDayName = (day: keyof DaysOfWeek): string => {
     const names: Record<keyof DaysOfWeek, string> = {
@@ -50,7 +52,6 @@ const TelaPrincipal = () => {
       setIsLoading(true);
       const today = getCurrentDayKey();
       setCurrentDay(today);
-      await StreakService.getStreak();
 
       const weeklyPlan = await WorkoutService.fetchWeeklyPlan();
 
@@ -111,20 +112,36 @@ const TelaPrincipal = () => {
       return;
     }
 
-    const updatedStatus = { ...completionStatus, [day]: true };
-    setCompletionStatus(updatedStatus);
-    await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
-    
-    const currentWorkouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
-    await StorageService.setItem(StorageKeys.TOTAL_WORKOUTS_COMPLETED, currentWorkouts + 1);
+    if (!user) {
+      Alert.alert('Erro de Sessão', 'Usuário não autenticado. Faça login novamente.');
+      return;
+    }
 
-    const currentTotalXp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
-    await StorageService.setItem(StorageKeys.USER_TOTAL_XP, currentTotalXp + 150);
+    try {
+      setIsFinishing(true);
+      
+      const title = `Treino de ${formatDayName(day)}`;
+      const durationMin = 45;
+      const xpAwarded = 150;
 
-    const newStreak = await StreakService.recordActivity();
+      const data = await WorkoutService.finishWorkoutAPI(user.id, title, durationMin, xpAwarded);
 
-    Alert.alert('Parabéns! 🎉', `Completou o treino de ${day} com sucesso e ganhou +150 XP!\n\n🔥 Ofensiva: ${newStreak} dia(s)`);
-  }, [currentDay, completionStatus]);
+      const updatedStatus = { ...completionStatus, [day]: true };
+      setCompletionStatus(updatedStatus);
+      await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
+      
+      if (fetchProgress) {
+        await fetchProgress();
+      }
+
+      Alert.alert('Parabéns! 🎉', `Completou o treino com sucesso na nuvem!\n\nGanhou +${xpAwarded} XP\n🔥 Ofensiva: ${data.streak.currentStreak} dia(s)`);
+      
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível salvar o seu progresso na nuvem. Verifique a sua conexão.');
+    } finally {
+      setIsFinishing(false);
+    }
+  }, [currentDay, completionStatus, user, fetchProgress]);
 
   const renderWorkoutCard = ({ item }: { item: DayWorkout }) => {
     const isCompleted = completionStatus[item.day];
@@ -156,20 +173,26 @@ const TelaPrincipal = () => {
 
         {item.isToday && (
           <TouchableOpacity
-            style={[styles.button, isCompleted ? styles.buttonCompleted : styles.buttonActive]}
+            style={[styles.button, isCompleted ? styles.buttonCompleted : styles.buttonActive, isFinishing && { opacity: 0.7 }]}
             onPress={() => handleCompleteWorkout(item.day)}
-            disabled={isCompleted}
+            disabled={isCompleted || isFinishing}
             activeOpacity={0.8}
           >
-            <FontAwesome5 
-              name={isCompleted ? "check-circle" : "play-circle"} 
-              size={18} 
-              color={theme.colors.surface} 
-              style={{ marginRight: 8 }} 
-            />
-            <Text style={styles.buttonText}>
-              {isCompleted ? 'Treino Concluído' : 'Começar Treino'}
-            </Text>
+            {isFinishing ? (
+              <ActivityIndicator color={theme.colors.surface} />
+            ) : (
+              <>
+                <FontAwesome5 
+                  name={isCompleted ? "check-circle" : "play-circle"} 
+                  size={18} 
+                  color={theme.colors.surface} 
+                  style={{ marginRight: 8 }} 
+                />
+                <Text style={styles.buttonText}>
+                  {isCompleted ? 'Treino Concluído' : 'Começar Treino'}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         )}
       </View>
