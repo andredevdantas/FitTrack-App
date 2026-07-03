@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { BarChart } from 'react-native-chart-kit';
 import { DaysContext } from '../contexts/DaysContext';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { UserContext } from '../contexts/UserContext';
 import { StreakService } from '../services/StreakService';
 import { DaysOfWeek } from '../types';
 import { StorageService, StorageKeys } from '../storage/StorageService';
@@ -16,6 +17,7 @@ const screenWidth = Dimensions.get("window").width;
 const TelaPerfil = () => {
   const { selectedDays, toggleDay } = useContext(DaysContext);
   const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const { user } = useContext(UserContext);
   const navigation = useNavigation<any>();
   const styles = getStyles(theme);
 
@@ -50,12 +52,16 @@ const TelaPerfil = () => {
 
   const loadData = async () => {
     try {
-      const xp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
       const missions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
       const workouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
-      const streak = await StreakService.getStreak();
+      const localStreak = await StreakService.getStreak();
       
-      setUserStats({ xp, missions, workouts, streak });
+      setUserStats({ 
+        xp: user?.xp || 0, 
+        missions, 
+        workouts, 
+        streak: (user as any)?.streak?.currentStreak ?? localStreak 
+      });
 
       const savedImage = await StorageService.getItem<string>(StorageKeys.USER_PROFILE_IMAGE);
       if (savedImage) setProfileImage(savedImage);
@@ -67,7 +73,7 @@ const TelaPerfil = () => {
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [])
+    }, [user])
   );
 
   const handlePickImage = async () => {
@@ -169,8 +175,9 @@ const TelaPerfil = () => {
           </View>
         </TouchableOpacity>
         
-        <Text style={styles.userName}>Atleta FitTrack</Text>
-        <Text style={styles.userEmail}>focado@fittrack.app</Text>
+        <Text style={styles.userName}>{user?.name || 'Atleta FitTrack'}</Text>
+        <Text style={styles.userEmail}>{user?.email || 'email@fittrack.app'}</Text>
+        
         <View style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -181,7 +188,7 @@ const TelaPerfil = () => {
           marginTop: 12,
         }}>
           <Text style={{ fontSize: 14, fontWeight: 'bold', color: theme.colors.warning }}>
-            🔥 {userStats.streak} {userStats.streak === 1 ? 'dia' : 'dias'} de ofensiva
+            {userStats.streak} {userStats.streak === 1 ? 'dia' : 'dias'} de ofensiva
           </Text>
         </View>
 
