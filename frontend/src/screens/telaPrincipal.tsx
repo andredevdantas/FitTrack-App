@@ -117,21 +117,28 @@ const TelaPrincipal = () => {
       return;
     }
 
+    const userId = (user as any).id || (user as any).userId;
+
+    if (!userId) {
+      Alert.alert('Erro', 'ID do usuário não encontrado na sessão.');
+      return;
+    }
+
     try {
       setIsFinishing(true);
       
       const title = `Treino de ${formatDayName(day)}`;
-      const durationMin = 45;
-      const xpAwarded = 150;
+      const durationMin = 45; 
+      const xpAwarded = 150; 
 
-      const data = await WorkoutService.finishWorkoutAPI(user.id, title, durationMin, xpAwarded);
+      const data = await WorkoutService.finishWorkoutAPI(userId, title, durationMin, xpAwarded);
 
       const updatedStatus = { ...completionStatus, [day]: true };
       setCompletionStatus(updatedStatus);
       await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
       
       if (fetchProgress) {
-        await fetchProgress();
+        await fetchProgress(userId);
       }
 
       Alert.alert('Parabéns! 🎉', `Completou o treino com sucesso na nuvem!\n\nGanhou +${xpAwarded} XP\n🔥 Ofensiva: ${data.streak.currentStreak} dia(s)`);
