@@ -6,16 +6,19 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { WorkoutService, DailyMission } from '../services/WorkoutService';
 import { StreakService } from '../services/StreakService';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { UserContext } from '../contexts/UserContext';
 import { getStyles } from '../styles/screens/telaMissoesStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
 const TelaMissoes = () => {
   const { theme } = useContext(ThemeContext);
+  const { user, fetchProgress } = useContext(UserContext);
   const styles = getStyles(theme);
 
   const [missions, setMissions] = useState<DailyMission[]>([]);
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [completingMissionId, setCompletingMissionId] = useState<string | null>(null);
   const [rerollsLeft, setRerollsLeft] = useState<number>(2);
   const [resetTime, setResetTime] = useState<number>(0);
   
@@ -67,7 +70,6 @@ const TelaMissoes = () => {
     try {
       setIsLoading(true);
       const nowTs = new Date().getTime();
-      await StreakService.getStreak();
 
       const savedAdmin = await StorageService.getItem<boolean>(StorageKeys.IS_ADMIN_MODE);
       if (savedAdmin) setIsAdminMode(true);
@@ -158,26 +160,43 @@ const TelaMissoes = () => {
     if (!completedIds.includes(id)) {
       const mission = missions.find(m => m.id === id);
       const missionXp = mission ? mission.xp : 0;
+      const missionDesc = mission ? mission.description : 'Missão Diária';
 
-      const newCompleted = [...completedIds, id];
-      setCompletedIds(newCompleted);
-      await StorageService.setItem(StorageKeys.MISSOES_COMPLETED, newCompleted);
+      if (!user) {
+        Alert.alert('Erro de Sessão', 'Usuário não autenticado. Faça login novamente.');
+        return;
+      }
 
-      const currentTotalXp = await StorageService.getItem<number>(StorageKeys.USER_TOTAL_XP) || 0;
-      await StorageService.setItem(StorageKeys.USER_TOTAL_XP, currentTotalXp + missionXp);
+      const userId = (user as any).id || (user as any).userId;
 
-      const currentTotalMissions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
-      await StorageService.setItem(StorageKeys.TOTAL_MISSIONS_COMPLETED, currentTotalMissions + 1);
+      if (!userId) {
+        Alert.alert('Erro', 'ID do usuário não encontrado na sessão.');
+        return;
+      }
 
-      if (newCompleted.length === 5) {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 5000);
-        
-        const newStreak = await StreakService.recordActivity();
-        
-        Alert.alert('Parabéns! 🏆', `Completou todas as missões do dia!\n\n🔥 Ofensiva: ${newStreak} dia(s)`);
-        setRerollsLeft(0);
-        await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 0);
+      try {
+        setCompletingMissionId(id);
+        const data = await WorkoutService.finishWorkoutAPI(userId, `Missão: ${missionDesc}`, 5, missionXp);
+        const newCompleted = [...completedIds, id];
+        setCompletedIds(newCompleted);
+        await StorageService.setItem(StorageKeys.MISSOES_COMPLETED, newCompleted);
+
+        if (fetchProgress) {
+          await fetchProgress(userId);
+        }
+
+        if (newCompleted.length === 5) {
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 5000);
+          
+          Alert.alert('Parabéns! 🏆', `Completou todas as missões do dia!\n\n🔥 Ofensiva mantida: ${data.streak.currentStreak} dia(s)`);
+          setRerollsLeft(0);
+          await StorageService.setItem(StorageKeys.MISSOES_REROLLS, 0);
+        }
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível salvar a missão na nuvem. Verifique a sua conexão.');
+      } finally {
+        setCompletingMissionId(null);
       }
     }
   };
@@ -253,6 +272,7 @@ const TelaMissoes = () => {
 
   const renderMissionCard = ({ item }: { item: DailyMission }) => {
     const isCompleted = completedIds.includes(item.id);
+    const isFinishing = completingMissionId === item.id;
 
     return (
       <View style={[styles.missionCard, isCompleted && styles.missionCardCompleted]}>
@@ -274,12 +294,16 @@ const TelaMissoes = () => {
         </View>
 
         <TouchableOpacity
-          style={[styles.completeButton, isCompleted && styles.completeButtonActive]}
+          style={[styles.completeButton, isCompleted && styles.completeButtonActive, isFinishing && { opacity: 0.7 }]}
           onPress={() => confirmMissionComplete(item.id)}
-          disabled={isCompleted || completedIds.length >= 5}
+          disabled={isCompleted || completedIds.length >= 5 || isFinishing || completingMissionId !== null}
           activeOpacity={0.7}
         >
-          {isCompleted && <FontAwesome5 name="check" size={16} color={theme.colors.surface} />}
+          {isFinishing ? (
+            <ActivityIndicator size="small" color={theme.colors.surface} />
+          ) : (
+            isCompleted && <FontAwesome5 name="check" size={16} color={theme.colors.surface} />
+          )}
         </TouchableOpacity>
       </View>
     );
