@@ -18,6 +18,9 @@ export class WorkoutService {
         xp: {
           increment: xpAwarded,
         },
+        totalWorkouts: {
+          increment: 1,
+        },
       },
     });
 
