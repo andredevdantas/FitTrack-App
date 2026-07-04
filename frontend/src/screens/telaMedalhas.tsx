@@ -30,9 +30,9 @@ const TelaMedalhas = () => {
       const adminMode = await StorageService.getItem<boolean>(StorageKeys.IS_ADMIN_MODE);
       setIsAdmin(adminMode || false);
 
-      const missions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
-      const workouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
       const xp = (user as any)?.xp || 0;
+      const missions = (user as any)?.totalMissions || 0;
+      const workouts = (user as any)?.totalWorkouts || 0;
       
       setUserStats({ xp, missions, workouts });
 
@@ -60,20 +60,8 @@ const TelaMedalhas = () => {
 
   const handleResetStats = () => {
     Alert.alert(
-      'Reset Global',
-      'Isto irá zerar as contagens locais de treinos e missões. (O XP real no servidor não será afetado). Tem certeza?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Zerar Local',
-          style: 'destructive',
-          onPress: async () => {
-            await StorageService.setItem(StorageKeys.TOTAL_MISSIONS_COMPLETED, 0);
-            await StorageService.setItem(StorageKeys.TOTAL_WORKOUTS_COMPLETED, 0);
-            setUserStats(prev => ({ ...prev, missions: 0, workouts: 0 }));
-          }
-        }
-      ]
+      'Reset Global Desativado',
+      'Como os dados agora estão sincronizados e protegidos na nuvem (PostgreSQL), o reset local de missões e treinos foi desativado por segurança.'
     );
   };
 
