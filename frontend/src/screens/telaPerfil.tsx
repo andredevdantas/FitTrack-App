@@ -52,14 +52,12 @@ const TelaPerfil = () => {
 
   const loadData = async () => {
     try {
-      const missions = await StorageService.getItem<number>(StorageKeys.TOTAL_MISSIONS_COMPLETED) || 0;
-      const workouts = await StorageService.getItem<number>(StorageKeys.TOTAL_WORKOUTS_COMPLETED) || 0;
       const localStreak = await StreakService.getStreak();
       
       setUserStats({ 
         xp: (user as any)?.xp || 0, 
-        missions, 
-        workouts, 
+        missions: (user as any)?.totalMissions || 0, 
+        workouts: (user as any)?.totalWorkouts || 0, 
         streak: (user as any)?.streak?.currentStreak ?? localStreak 
       });
 
