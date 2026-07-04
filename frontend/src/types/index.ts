@@ -1,9 +1,18 @@
+export interface Streak {
+  id: string;
+  currentStreak: number;
+  longestStreak: number;
+  lastActive: string | Date;
+}
+
 export interface User {
-  nome?: string;
-  idade: string;
-  peso: string;
-  altura: string;
-  fotoUri?: string;
+  id: string;
+  name: string;
+  email: string;
+  xp: number;
+  totalWorkouts: number;
+  totalMissions: number;
+  streak?: Streak;
 }
 
 export interface Mission {
