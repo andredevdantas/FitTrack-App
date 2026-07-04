@@ -7,15 +7,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  xp        Int      @default(0)
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password      String
+  xp            Int      @default(0)
+  totalWorkouts Int      @default(0)
+  totalMissions Int      @default(0)
   
   // Relacionamentos
-  workouts  Workout[] // Um usuário pode ter varios treinos
-  streak    Streak? // Um usuário tem uma ofensiva
+  workouts      Workout[] // Um usuário pode ter varios treinos
+  streak        Streak?   // Um usuário tem uma ofensiva
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
