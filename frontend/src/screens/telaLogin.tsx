@@ -18,29 +18,47 @@ interface Props {
 }
 
 const TelaLogin = ({ navigation }: Props) => {
-  const { register, isLoading } = useContext(UserContext);
+  const { register, login, isLoading } = useContext(UserContext);
   const { theme } = useContext(ThemeContext);  
   const styles = getStyles(theme);
   
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = async () => {
-    if (!nome.trim() || !email.trim()) {
-      setError('Por favor, preencha todos os campos.');
+  const handleSubmit = async () => {
+    if (!email.trim() || !password.trim()) {
+      setError('Por favor, preencha email e senha.');
+      return;
+    }
+
+    if (!isLoginMode && !nome.trim()) {
+      setError('Por favor, informe seu nome de herói.');
       return;
     }
 
     setError('');
     
     try {
-      await register(nome, email);
+      if (isLoginMode) {
+        await login(email, password);
+      } else {
+        await register(nome, email, password);
+      }
+      
       await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
       navigation.navigate('MainTabs');
     } catch (err: any) {
-      setError('Erro ao conectar com o servidor. Tente novamente.');
+      setError(err.response?.data?.error || 'Erro ao conectar com o servidor. Verifique suas credenciais.');
     }
+  };
+
+  const toggleMode = () => {
+    setIsLoginMode(!isLoginMode);
+    setError('');
+    setPassword('');
   };
 
   return (
@@ -50,19 +68,23 @@ const TelaLogin = ({ navigation }: Props) => {
     >
       <View style={styles.card}>
         <Text style={styles.title}>Bem-vindo ao FitTrack</Text>
-        <Text style={styles.subtitle}>Crie sua conta para sincronizar seu progresso</Text>
+        <Text style={styles.subtitle}>
+          {isLoginMode ? 'Acesse sua conta para continuar' : 'Crie sua conta para sincronizar seu progresso'}
+        </Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Nome de Herói</Text>
-          <TextInput
-            style={styles.input}
-            value={nome}
-            onChangeText={setNome}
-            placeholder="Ex: Arthur Pendragon"
-            placeholderTextColor={theme.colors.textMuted}
-            autoCapitalize="words"
-          />
-        </View>
+        {!isLoginMode && (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Nome de Herói</Text>
+            <TextInput
+              style={styles.input}
+              value={nome}
+              onChangeText={setNome}
+              placeholder="Ex: Arthur Pendragon"
+              placeholderTextColor={theme.colors.textMuted}
+              autoCapitalize="words"
+            />
+          </View>
+        )}
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>E-mail</Text>
@@ -77,19 +99,40 @@ const TelaLogin = ({ navigation }: Props) => {
           />
         </View>
 
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Senha</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+            placeholder="Sua senha secreta"
+            placeholderTextColor={theme.colors.textMuted}
+            autoCapitalize="none"
+          />
+        </View>
+
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <TouchableOpacity 
           style={[styles.button, isLoading && styles.buttonDisabled]} 
-          onPress={handleLogin} 
+          onPress={handleSubmit} 
           activeOpacity={0.8}
           disabled={isLoading}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text style={styles.buttonText}>Começar Jornada</Text>
+            <Text style={styles.buttonText}>
+              {isLoginMode ? 'Entrar' : 'Começar Jornada'}
+            </Text>
           )}
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={toggleMode} style={{ marginTop: 20, alignItems: 'center' }}>
+          <Text style={{ color: theme.colors.primary, fontWeight: 'bold' }}>
+            {isLoginMode ? 'Não possui conta? Crie uma agora!' : 'Já tem uma conta? Entre aqui.'}
+          </Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
