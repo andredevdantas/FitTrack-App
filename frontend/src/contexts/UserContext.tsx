@@ -6,6 +6,7 @@ import { User } from '../types';
 interface UserContextData {
   user: User | null;
   isLoading: boolean;
+  login: (email: string, password?: string) => Promise<void>;
   register: (name: string, email: string, password?: string) => Promise<void>;
   fetchProgress: (userId: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -24,9 +25,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const loadSession = async () => {
     setIsLoading(true);
     try {
+      const storedToken = await StorageService.getItem<string>('USER_TOKEN');
       const storedUserId = await StorageService.getItem<string>('USER_ID');
       
-      if (storedUserId) {
+      if (storedToken && storedUserId) {
         await fetchProgress(storedUserId);
       }
     } catch (error) {
@@ -46,14 +48,29 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const login = async (email: string, password = 'senha_padrao') => {
+    setIsLoading(true);
+    try {
+      const response = await api.post('/users/login', { email, password });
+      const { user: loggedUser, token } = response.data;
+      
+      setUser(loggedUser);
+      
+      await StorageService.setItem('USER_TOKEN', token);
+      await StorageService.setItem('USER_ID', loggedUser.id);
+    } catch (error: any) {
+      console.error('Erro no login:', error.response?.data || error.message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const register = async (name: string, email: string, password = 'senha_padrao') => {
     setIsLoading(true);
     try {
-      const response = await api.post('/users/register', { name, email, password });
-      const newUser = response.data;
-      setUser(newUser);
-      
-      await StorageService.setItem('USER_ID', newUser.id);
+      await api.post('/users/register', { name, email, password });
+      await login(email, password);
     } catch (error: any) {
       console.error('Erro ao registrar na API:', error.response?.data || error.message);
       throw error;
@@ -65,10 +82,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     setUser(null);
     await StorageService.removeItem('USER_ID');
+    await StorageService.removeItem('USER_TOKEN');
   };
 
   return (
-    <UserContext.Provider value={{ user, isLoading, register, fetchProgress, logout }}>
+    <UserContext.Provider value={{ user, isLoading, login, register, fetchProgress, logout }}>
       {children}
     </UserContext.Provider>
   );
