@@ -70,12 +70,13 @@ export const WorkoutService = {
     }
   },
 
-  async finishWorkoutAPI(userId: string, title: string, durationMin: number, xpAwarded: number) {
+  async finishWorkoutAPI(userId: string, title: string, durationMin: number, xpAwarded: number, isMission: boolean = false) {
     try {
       const response = await api.post(`/workouts/${userId}/finish`, {
         title,
         durationMin,
-        xpAwarded
+        xpAwarded,
+        isMission
       });
       return response.data; 
     } catch (error: any) {

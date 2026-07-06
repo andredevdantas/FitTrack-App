@@ -162,27 +162,21 @@ const TelaMissoes = () => {
       const missionXp = mission ? mission.xp : 0;
       const missionDesc = mission ? mission.description : 'Missão Diária';
 
-      if (!user) {
+      if (!user || !user.id) {
         Alert.alert('Erro de Sessão', 'Usuário não autenticado. Faça login novamente.');
-        return;
-      }
-
-      const userId = (user as any).id || (user as any).userId;
-
-      if (!userId) {
-        Alert.alert('Erro', 'ID do usuário não encontrado na sessão.');
         return;
       }
 
       try {
         setCompletingMissionId(id);
-        const data = await WorkoutService.finishWorkoutAPI(userId, `Missão: ${missionDesc}`, 5, missionXp);
+        
+        const data = await WorkoutService.finishWorkoutAPI(user.id, `Missão: ${missionDesc}`, 5, missionXp, true);
         const newCompleted = [...completedIds, id];
         setCompletedIds(newCompleted);
         await StorageService.setItem(StorageKeys.MISSOES_COMPLETED, newCompleted);
 
         if (fetchProgress) {
-          await fetchProgress(userId);
+          await fetchProgress(user.id);
         }
 
         if (newCompleted.length === 5) {
