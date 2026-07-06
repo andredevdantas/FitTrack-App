@@ -1,7 +1,7 @@
 import { prisma } from '../utils/prisma';
 
 export class WorkoutService {
-  async registerWorkout(userId: string, title: string, durationMin: number, xpAwarded: number) {
+  async registerWorkout(userId: string, title: string, durationMin: number, xpAwarded: number, isMission: boolean = false) {
 
     const workout = await prisma.workout.create({
       data: {
@@ -18,9 +18,8 @@ export class WorkoutService {
         xp: {
           increment: xpAwarded,
         },
-        totalWorkouts: {
-          increment: 1,
-        },
+        totalWorkouts: isMission ? undefined : { increment: 1 },
+        totalMissions: isMission ? { increment: 1 } : undefined,
       },
     });
 
