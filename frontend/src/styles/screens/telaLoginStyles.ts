@@ -69,4 +69,37 @@ export const getStyles = (theme: any) => StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: theme.colors.border,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: theme.colors.textMuted,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    paddingVertical: 14,
+    marginBottom: 12,
+  },
+  socialButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.textTitle,
+    marginLeft: 12,
+  },
 });
