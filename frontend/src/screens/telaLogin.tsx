@@ -6,8 +6,10 @@ import {
   TouchableOpacity, 
   KeyboardAvoidingView, 
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { UserContext } from '../contexts/UserContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { StorageService, StorageKeys } from '../storage/StorageService';
@@ -59,6 +61,10 @@ const TelaLogin = ({ navigation }: Props) => {
     setIsLoginMode(!isLoginMode);
     setError('');
     setPassword('');
+  };
+
+  const handleSocialLoginMock = (provider: string) => {
+    Alert.alert('Em breve!', `A integração de login com a ${provider} será implementada no próximo ciclo de desenvolvimento.`);
   };
 
   return (
@@ -127,6 +133,31 @@ const TelaLogin = ({ navigation }: Props) => {
               {isLoginMode ? 'Entrar' : 'Começar Jornada'}
             </Text>
           )}
+        </TouchableOpacity>
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ou</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {/* Botão Google */}
+        <TouchableOpacity 
+          style={styles.socialButton} 
+          onPress={() => handleSocialLoginMock('Google')}
+          activeOpacity={0.7}
+        >
+          <FontAwesome5 name="google" size={18} color="#DB4437" />
+          <Text style={styles.socialButtonText}>Continuar com o Google</Text>
+        </TouchableOpacity>
+
+        {/* Botão Apple */}
+        <TouchableOpacity 
+          style={styles.socialButton} 
+          onPress={() => handleSocialLoginMock('Apple')}
+          activeOpacity={0.7}
+        >
+          <FontAwesome5 name="apple" size={20} color={theme.colors.textTitle} />
+          <Text style={styles.socialButtonText}>Continuar com a Apple</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={toggleMode} style={{ marginTop: 20, alignItems: 'center' }}>
