@@ -10,14 +10,15 @@ model User {
   id            String   @id @default(uuid())
   name          String
   email         String   @unique
-  password      String
+  password      String?  // Tornou-se opcional
+  googleId      String?  @unique // Identificador único do Google
   xp            Int      @default(0)
   totalWorkouts Int      @default(0)
   totalMissions Int      @default(0)
   
   // Relacionamentos
-  workouts      Workout[] // Um usuário pode ter varios treinos
-  streak        Streak?   // Um usuário tem uma ofensiva
+  workouts      Workout[]
+  streak        Streak?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
