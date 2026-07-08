@@ -30,7 +30,7 @@ export class UserService {
       }
     });
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user as any;
     return userWithoutPassword;
   }
 
@@ -38,6 +38,9 @@ export class UserService {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new Error('Credenciais inválidas.');
+    }
+    if (!user.password) {
+      throw new Error('Esta conta foi criada com o Google. Utilize o botão "Continuar com o Google".');
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -47,7 +50,39 @@ export class UserService {
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user as any;
+    return { user: userWithoutPassword, token };
+  }
+
+  async loginWithGoogle(email: string, name: string, googleId: string) {
+    let user = await prisma.user.findUnique({ where: { email } });
+
+    if (user) {
+      if (!user.googleId) {
+        user = await prisma.user.update({
+          where: { email },
+          data: { googleId },
+        });
+      }
+    } else {
+      user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          googleId,
+          streak: {
+            create: {
+              currentStreak: 0,
+              longestStreak: 0,
+            }
+          }
+        }
+      });
+    }
+
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
+    
+    const { password: _, ...userWithoutPassword } = user as any;
     return { user: userWithoutPassword, token };
   }
 
