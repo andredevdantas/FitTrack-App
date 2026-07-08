@@ -8,6 +8,7 @@ interface UserContextData {
   isLoading: boolean;
   login: (email: string, password?: string) => Promise<void>;
   register: (name: string, email: string, password?: string) => Promise<void>;
+  loginWithGoogle: (email: string, name: string, googleId: string) => Promise<void>;
   fetchProgress: (userId: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -79,6 +80,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loginWithGoogle = async (email: string, name: string, googleId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await api.post('/users/login/google', { email, name, googleId });
+      const { user: loggedUser, token } = response.data;
+
+      setUser(loggedUser);
+
+      await StorageService.setItem('USER_TOKEN', token);
+      await StorageService.setItem('USER_ID', loggedUser.id);
+    } catch (error: any) {
+      console.error('Erro no login com Google:', error.response?.data || error.message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setUser(null);
     await StorageService.removeItem('USER_ID');
@@ -86,7 +105,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, isLoading, login, register, fetchProgress, logout }}>
+    <UserContext.Provider value={{ user, isLoading, login, register, loginWithGoogle, fetchProgress, logout }}>
       {children}
     </UserContext.Provider>
   );
