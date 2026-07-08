@@ -34,6 +34,21 @@ export class UserController {
     }
   }
 
+  async loginWithGoogle(req: Request, res: Response) {
+    try {
+      const { email, name, googleId } = req.body;
+
+      if (!email || !name || !googleId) {
+        return res.status(400).json({ error: 'Dados de autenticação do Google incompletos.' });
+      }
+
+      const data = await userService.loginWithGoogle(email, name, googleId);
+      return res.status(200).json(data);
+    } catch (error: any) {
+      return res.status(401).json({ error: error.message });
+    }
+  }
+
   async getProgress(req: Request, res: Response) {
     try {
       const id = req.params.id as string;
