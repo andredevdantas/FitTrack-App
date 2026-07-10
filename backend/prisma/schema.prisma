@@ -7,18 +7,20 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  name          String
-  email         String   @unique
-  password      String?  // Tornou-se opcional
-  googleId      String?  @unique // Identificador único do Google
-  xp            Int      @default(0)
-  totalWorkouts Int      @default(0)
-  totalMissions Int      @default(0)
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String?
+  googleId         String?  @unique
+  isEmailVerified  Boolean  @default(false)
+  verificationCode String?
+  xp               Int      @default(0)
+  totalWorkouts    Int      @default(0)
+  totalMissions    Int      @default(0)
   
   // Relacionamentos
-  workouts      Workout[]
-  streak        Streak?
+  workouts         Workout[]
+  streak           Streak?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -27,7 +29,7 @@ model User {
 model Workout {
   id          String   @id @default(uuid())
   title       String
-  durationMin Int     
+  durationMin Int      
   xpAwarded   Int
   date        DateTime @default(now())
 
