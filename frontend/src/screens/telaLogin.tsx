@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,17 +10,22 @@ import {
   Alert
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import { UserContext } from '../contexts/UserContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 import { getStyles } from '../styles/screens/telaLoginStyles';
+
+// OBRIGATÓRIO: Permite que o navegador feche automaticamente após o usuário aprovar o login
+WebBrowser.maybeCompleteAuthSession();
 
 interface Props {
   navigation: any; 
 }
 
 const TelaLogin = ({ navigation }: Props) => {
-  const { register, login, isLoading } = useContext(UserContext);
+  const { register, login, loginWithGoogle, isLoading } = useContext(UserContext);
   const { theme } = useContext(ThemeContext);  
   const styles = getStyles(theme);
   
@@ -29,6 +34,38 @@ const TelaLogin = ({ navigation }: Props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success' && response.authentication) {
+      fetchGoogleUserInfo(response.authentication.accessToken);
+    } else if (response?.type === 'error') {
+      setError('Ocorreu um erro ao tentar fazer login com o Google.');
+    }
+  }, [response]);
+
+  const fetchGoogleUserInfo = async (token: string) => {
+    setIsGoogleLoading(true);
+    try {
+      const userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const userInfo = await userInfoResponse.json();
+
+      await loginWithGoogle(userInfo.email, userInfo.name, userInfo.id);
+      
+      await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
+      navigation.navigate('MainTabs');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Erro ao vincular conta do Google.');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
@@ -63,8 +100,8 @@ const TelaLogin = ({ navigation }: Props) => {
     setPassword('');
   };
 
-  const handleSocialLoginMock = (provider: string) => {
-    Alert.alert('Em breve!', `A integração de login com a ${provider} será implementada no próximo ciclo de desenvolvimento.`);
+  const handleAppleMock = () => {
+    Alert.alert('Em breve!', 'A integração com a Apple será implementada no próximo ciclo.');
   };
 
   return (
@@ -121,10 +158,10 @@ const TelaLogin = ({ navigation }: Props) => {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <TouchableOpacity 
-          style={[styles.button, isLoading && styles.buttonDisabled]} 
+          style={[styles.button, (isLoading || isGoogleLoading) && styles.buttonDisabled]} 
           onPress={handleSubmit} 
           activeOpacity={0.8}
-          disabled={isLoading}
+          disabled={isLoading || isGoogleLoading}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFF" />
@@ -134,26 +171,32 @@ const TelaLogin = ({ navigation }: Props) => {
             </Text>
           )}
         </TouchableOpacity>
+
         <View style={styles.dividerContainer}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>ou</Text>
           <View style={styles.dividerLine} />
         </View>
 
-        {/* Botão Google */}
         <TouchableOpacity 
-          style={styles.socialButton} 
-          onPress={() => handleSocialLoginMock('Google')}
+          style={[styles.socialButton, (isLoading || isGoogleLoading) && { opacity: 0.7 }]} 
+          onPress={() => promptAsync()}
           activeOpacity={0.7}
+          disabled={!request || isLoading || isGoogleLoading}
         >
-          <FontAwesome5 name="google" size={18} color="#DB4437" />
-          <Text style={styles.socialButtonText}>Continuar com o Google</Text>
+          {isGoogleLoading ? (
+            <ActivityIndicator color="#DB4437" />
+          ) : (
+            <>
+              <FontAwesome5 name="google" size={18} color="#DB4437" />
+              <Text style={styles.socialButtonText}>Continuar com o Google</Text>
+            </>
+          )}
         </TouchableOpacity>
 
-        {/* Botão Apple */}
         <TouchableOpacity 
           style={styles.socialButton} 
-          onPress={() => handleSocialLoginMock('Apple')}
+          onPress={handleAppleMock}
           activeOpacity={0.7}
         >
           <FontAwesome5 name="apple" size={20} color={theme.colors.textTitle} />
