@@ -7,6 +7,7 @@ const userController = new UserController();
 
 // Rotas públicas
 router.post('/register', userController.register);
+router.post('/verify-email', userController.verifyEmail);
 router.post('/login', userController.login);
 router.post('/login/google', userController.loginWithGoogle);
 

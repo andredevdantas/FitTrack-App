@@ -13,9 +13,24 @@ export class UserController {
       }
 
       const user = await userService.createUser(name, email, password);
-      return res.status(201).json(user);
+      return res.status(201).json({ message: 'Conta criada. Verifique seu e-mail.', user });
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    try {
+      const { email, code } = req.body;
+      
+      if (!email || !code) {
+        return res.status(400).json({ error: 'E-mail e código são obrigatórios.' });
+      }
+
+      const data = await userService.verifyEmailCode(email, code);
+      return res.status(200).json(data);
+    } catch (error: any) {
+       return res.status(400).json({ error: error.message });
     }
   }
 
