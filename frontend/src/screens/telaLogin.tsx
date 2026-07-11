@@ -17,7 +17,6 @@ import { ThemeContext } from '../contexts/ThemeContext';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 import { getStyles } from '../styles/screens/telaLoginStyles';
 
-// OBRIGATÓRIO: Permite que o navegador feche automaticamente após o usuário aprovar o login
 WebBrowser.maybeCompleteAuthSession();
 
 interface Props {
@@ -83,12 +82,12 @@ const TelaLogin = ({ navigation }: Props) => {
     try {
       if (isLoginMode) {
         await login(email, password);
+        await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
+        navigation.navigate('MainTabs');
       } else {
         await register(nome, email, password);
+        navigation.navigate('Verificacao', { email });
       }
-      
-      await StorageService.setItem(StorageKeys.IS_FIRST_TIME, false);
-      navigation.navigate('MainTabs');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao conectar com o servidor. Verifique suas credenciais.');
     }
