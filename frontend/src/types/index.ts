@@ -39,6 +39,7 @@ export interface DaysOfWeek {
 
 export type RootStackParamList = {
   Login: undefined;
+  Verificacao: { email: string };
   MainTabs: undefined;
 };
 
