@@ -6,6 +6,7 @@ import { StorageService, StorageKeys } from '../storage/StorageService';
 import { RootStackParamList } from '../types';
 
 import telaLogin from '../screens/telaLogin';
+import TelaVerificacao from '../screens/telaVerificacao';
 import TabNavigator from './TabNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -37,6 +38,7 @@ export function Routes() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={telaLogin} />
+        <Stack.Screen name="Verificacao" component={TelaVerificacao} />
         <Stack.Screen name="MainTabs" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
