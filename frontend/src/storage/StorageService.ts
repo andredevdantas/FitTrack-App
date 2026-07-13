@@ -23,6 +23,8 @@ export const StorageKeys = {
 
   STREAK_COUNT: '@FitTrack:streakCount',
   STREAK_LAST_DATE: '@FitTrack:streakLastDate',
+  
+  OFFLINE_QUEUE: '@FitTrack:offlineQueue',
 };
 
 export const StorageService = {
