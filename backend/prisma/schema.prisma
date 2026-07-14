@@ -15,6 +15,7 @@ model User {
   isEmailVerified  Boolean  @default(false)
   verificationCode String?
   xp               Int      @default(0)
+  level            Int      @default(1)
   totalWorkouts    Int      @default(0)
   totalMissions    Int      @default(0)
   
