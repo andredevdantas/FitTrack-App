@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 import { StorageService } from '../storage/StorageService'; 
 import { api } from '../services/api';
+import { WorkoutService } from '../services/WorkoutService';
 import { User } from '../types';
 
 interface UserContextData {
@@ -22,6 +24,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     loadSession();
+
+    const unsubscribeNetwork = NetInfo.addEventListener(async (state) => {
+      if (state.isConnected) {
+        const storedUserId = await StorageService.getItem<string>('USER_ID');
+        if (storedUserId) {
+          await WorkoutService.syncOfflineQueue();
+          await fetchProgress(storedUserId);
+        }
+      }
+    });
+
+    return () => unsubscribeNetwork();
   }, []);
 
   const loadSession = async () => {
@@ -46,7 +60,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUser(response.data);
     } catch (error) {
       console.error('Erro ao buscar progresso na API:', error);
-      await logout(); 
     }
   };
 
