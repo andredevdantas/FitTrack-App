@@ -17,7 +17,7 @@ const screenWidth = Dimensions.get("window").width;
 const TelaPerfil = () => {
   const { selectedDays, toggleDay } = useContext(DaysContext);
   const { theme, isDarkMode, toggleTheme } = useContext(ThemeContext);
-  const { user } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext);
   const navigation = useNavigation<any>();
   const styles = getStyles(theme);
 
@@ -112,7 +112,8 @@ const TelaPerfil = () => {
       { 
         text: 'Sair', 
         style: 'destructive',
-        onPress: () => {
+        onPress: async () => {
+          await logout();
           navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         }
       }
