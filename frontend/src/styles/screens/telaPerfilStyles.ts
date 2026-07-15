@@ -182,4 +182,27 @@ export const getStyles = (theme: any) => StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
   },
+  levelContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  levelText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+    marginBottom: 8,
+  },
+  progressBarBackground: {
+    height: 10,
+    width: '90%',
+    backgroundColor: theme.colors.border,
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: theme.colors.primary,
+  },
 });
