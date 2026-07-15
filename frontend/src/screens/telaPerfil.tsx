@@ -48,6 +48,7 @@ const TelaPerfil = () => {
     missions: 0,
     workouts: 0,
     streak: 0,
+    level: 1,
   });
 
   const loadData = async () => {
@@ -58,7 +59,8 @@ const TelaPerfil = () => {
         xp: (user as any)?.xp || 0, 
         missions: (user as any)?.totalMissions || 0, 
         workouts: (user as any)?.totalWorkouts || 0, 
-        streak: (user as any)?.streak?.currentStreak ?? localStreak 
+        streak: (user as any)?.streak?.currentStreak ?? localStreak,
+        level: (user as any)?.level || 1,
       });
 
       const savedImage = await StorageService.getItem<string>(StorageKeys.USER_PROFILE_IMAGE);
@@ -176,7 +178,14 @@ const TelaPerfil = () => {
         
         <Text style={styles.userName}>{(user as any)?.name || 'Atleta FitTrack'}</Text>
         <Text style={styles.userEmail}>{(user as any)?.email || 'email@fittrack.app'}</Text>
-        
+    
+        <View style={styles.levelContainer}>
+          <Text style={styles.levelText}>Nível {userStats.level}</Text>
+          <View style={styles.progressBarBackground}>
+            <View style={[styles.progressBarFill, { width: `${(userStats.xp % 500) / 500 * 100}%` }]} />
+          </View>
+        </View>
+
         <View style={{
           flexDirection: 'row',
           alignItems: 'center',
