@@ -144,4 +144,36 @@ export class UserService {
       }
     });
   }
+
+  async getLeaderboard(userId: string) {
+    const topUsers = await prisma.user.findMany({
+      orderBy: { xp: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        name: true,
+        xp: true,
+        level: true,
+      }
+    });
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, xp: true, level: true }
+    });
+
+    let userRank = 0;
+    if (currentUser) {
+      const higherXpCount = await prisma.user.count({
+        where: { xp: { gt: currentUser.xp } }
+      });
+      userRank = higherXpCount + 1;
+    }
+
+    return { 
+      topUsers, 
+      currentUser, 
+      userRank 
+    };
+  }
 }
