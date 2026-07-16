@@ -13,5 +13,6 @@ router.post('/login/google', userController.loginWithGoogle);
 
 // Rotas privadas
 router.get('/:id/progress', authMiddleware, userController.getProgress);
+router.get('/:id/leaderboard', authMiddleware, userController.getLeaderboard);
 
 export default router;

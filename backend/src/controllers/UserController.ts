@@ -78,4 +78,14 @@ export class UserController {
       return res.status(500).json({ error: 'Erro interno ao buscar progresso.' });
     }
   }
+
+  async getLeaderboard(req: Request, res: Response) {
+    try {
+      const id = req.params.id as string;
+      const data = await userService.getLeaderboard(id);
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro interno ao buscar classificação.' });
+    }
+  }
 }
