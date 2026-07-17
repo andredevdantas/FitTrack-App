@@ -8,6 +8,7 @@ import { ThemeContext } from '../contexts/ThemeContext';
 import telaPrincipal from '../screens/telaPrincipal';
 import telaMedalhas from '../screens/telaMedalhas';
 import telaMissoes from '../screens/telaMissoes';
+import telaRanking from '../screens/telaRanking';
 import telaPerfil from '../screens/telaPerfil';
 import { getStyles, getTabBarColors } from '../styles/navigation/TabNavigatorStyles';
 
@@ -43,6 +44,8 @@ export default function TabNavigator() {
             iconName = 'medal';
           } else if (route.name === 'Missoes') {
             iconName = 'clipboard-list';
+          } else if (route.name === 'Ranking') {
+            iconName = 'trophy';
           } else if (route.name === 'Perfil') {
             iconName = 'user-alt';
           }
@@ -54,6 +57,7 @@ export default function TabNavigator() {
       <Tab.Screen name="Principal" component={telaPrincipal} />
       <Tab.Screen name="Medalhas" component={telaMedalhas} />
       <Tab.Screen name="Missoes" component={telaMissoes} />
+      <Tab.Screen name="Ranking" component={telaRanking} />
       <Tab.Screen name="Perfil" component={telaPerfil} />
     </Tab.Navigator>
   );

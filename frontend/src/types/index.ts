@@ -47,5 +47,6 @@ export type MainTabParamList = {
   Principal: undefined;
   Medalhas: undefined;
   Missoes: undefined;
+  Ranking: undefined;
   Perfil: undefined;
 };
