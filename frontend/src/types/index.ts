@@ -37,6 +37,18 @@ export interface DaysOfWeek {
   domingo: boolean;
 }
 
+export interface Exercise {
+  id: string;
+  name: string;
+  details: string;
+  dayOfWeek: string;
+  muscleGroup: string;
+  sets: number;
+  reps: string;
+  restTime: number;
+  imageUrl?: string | null;
+}
+
 export type RootStackParamList = {
   Login: undefined;
   Verificacao: { email: string };
