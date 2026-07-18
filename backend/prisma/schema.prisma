@@ -51,11 +51,17 @@ model Streak {
 }
 
 model Exercise {
-  id        String   @id @default(uuid())
-  name      String
-  details   String
-  dayOfWeek String
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  name        String
+  details     String
+  dayOfWeek   String
+  muscleGroup String   @default("Corpo Inteiro") // Peito, Costas, Pernas
+  sets        Int      @default(3)               // Quantidade de séries
+  reps        String   @default("10 a 12")
+  restTime    Int      @default(60)              // Tempo de descanso em segundos
+  imageUrl    String?
+
+  createdAt   DateTime @default(now())
 
   @@map("exercises")
 }
