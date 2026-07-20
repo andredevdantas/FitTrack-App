@@ -1,29 +1,17 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { height } = Dimensions.get('window');
 
 export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-  },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 10,
     backgroundColor: theme.colors.surface,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
-    marginBottom: 16,
   },
   title: {
     fontSize: 28,
@@ -35,107 +23,227 @@ export const getStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.textBody,
     marginTop: 4,
   },
-  list: {
-    flex: 1,
+  calendarContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    backgroundColor: theme.colors.surface,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+    marginBottom: 15,
+  },
+  dayButton: {
+    width: 65,
+    height: 75,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 5,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  dayButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  dayTextWeek: {
+    fontSize: 12,
+    color: theme.colors.textBody,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+  },
+  dayTextDate: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+  },
+  dayTextActive: {
+    color: '#FFF',
+  },
+  todayIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.primary,
+    marginTop: 4,
+  },
+  activeTodayIndicator: {
+    backgroundColor: '#FFF',
   },
   listContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 30,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
-  card: {
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+    marginBottom: 15,
+    marginTop: 10,
+  },
+  richCard: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: theme.colors.border,
-  },
-  cardToday: {
-    borderLeftColor: theme.colors.primary,
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     elevation: 4,
   },
-  cardHeader: {
+  richCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 15,
   },
-  dayTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: theme.colors.textDark,
-  },
-  dayTitleToday: {
-    color: theme.colors.primary,
-  },
-  badgeToday: {
-    backgroundColor: theme.colors.badgeBg,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  muscleTag: {
+    backgroundColor: `${theme.colors.primary}15`,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
   },
-  badgeText: {
+  muscleTagText: {
     color: theme.colors.primary,
-    fontSize: 12,
     fontWeight: 'bold',
+    fontSize: 12,
+    textTransform: 'uppercase',
   },
-  exercisesContainer: {
-    marginBottom: 10,
-  },
-  exerciseRow: {
+  exerciseMetaContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
+    alignItems: 'center',
   },
-  exerciseTextContainer: {
-    marginLeft: 10,
-    flex: 1,
+  exerciseMetaText: {
+    fontSize: 13,
+    color: theme.colors.textBody,
+    marginLeft: 6,
+    marginRight: 15,
+    fontWeight: '500',
   },
   exerciseName: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: theme.colors.textDark,
+    color: theme.colors.textTitle,
+    marginBottom: 4,
   },
   exerciseDetails: {
-    fontSize: 13,
+    fontSize: 14,
+    color: theme.colors.textBody,
+    marginBottom: 15,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    marginTop: 50,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: theme.colors.textBody,
+    fontSize: 16,
+    marginTop: 16,
+    lineHeight: 24,
+  },
+  openModalBtn: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  openModalBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  completedBtn: {
+    backgroundColor: theme.colors.success || '#4CAF50',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  bottomSheet: {
+    backgroundColor: theme.colors.background,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    minHeight: height * 0.6,
+    maxHeight: height * 0.9,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  sheetTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+  },
+  closeBtn: {
+    padding: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 20,
+  },
+  sheetExerciseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  sheetExerciseInfo: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  sheetExerciseName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: theme.colors.textTitle,
+  },
+  sheetExerciseReps: {
+    fontSize: 14,
     color: theme.colors.textBody,
     marginTop: 2,
   },
-  button: {
-    flexDirection: 'row',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  buttonActive: {
+  hugeStartBtn: {
     backgroundColor: theme.colors.primary,
-  },
-  buttonCompleted: {
-    backgroundColor: theme.colors.textMuted,
-  },
-  buttonText: {
-    color: theme.colors.surface,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  emptyContainer: {
+    borderRadius: 100,
+    paddingVertical: 18,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 60,
+    marginTop: 20,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
   },
-  emptyText: {
-    fontSize: 16,
-    color: theme.colors.textBody,
-    textAlign: 'center',
-    marginTop: 16,
-    paddingHorizontal: 20,
-  },
+  hugeStartBtnText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  }
 });
