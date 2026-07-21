@@ -1,21 +1,33 @@
-import React, { useState, useContext, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useContext, useCallback, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Modal } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { WorkoutService, Exercise } from '../services/WorkoutService';
+import { WorkoutService } from '../services/WorkoutService';
 import { UserContext } from '../contexts/UserContext'; 
 import { DaysContext } from '../contexts/DaysContext';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { DaysOfWeek } from '../types';
+import { DaysOfWeek, Exercise } from '../types';
 import { getStyles } from '../styles/screens/telaPrincipalStyles';
 import { StorageService, StorageKeys } from '../storage/StorageService';
 
 interface DayWorkout {
   day: keyof DaysOfWeek;
   label: string;
+  shortLabel: string;
   exercises: Exercise[];
   isToday: boolean;
+  dateIndex: number;
 }
+
+const WEEK_DAYS: { key: keyof DaysOfWeek, short: string }[] = [
+  { key: 'domingo', short: 'Dom' },
+  { key: 'segunda', short: 'Seg' },
+  { key: 'terca', short: 'Ter' },
+  { key: 'quarta', short: 'Qua' },
+  { key: 'quinta', short: 'Qui' },
+  { key: 'sexta', short: 'Sex' },
+  { key: 'sabado', short: 'Sáb' },
+];
 
 const TelaPrincipal = () => {
   const { selectedDays } = useContext(DaysContext);
@@ -25,26 +37,18 @@ const TelaPrincipal = () => {
 
   const [workouts, setWorkouts] = useState<DayWorkout[]>([]);
   const [currentDay, setCurrentDay] = useState<keyof DaysOfWeek>('segunda');
+  const [viewDay, setViewDay] = useState<keyof DaysOfWeek>('segunda');
+  
   const [completionStatus, setCompletionStatus] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isFinishing, setIsFinishing] = useState<boolean>(false);
+  
+  const [activeWorkoutModal, setActiveWorkoutModal] = useState<DayWorkout | null>(null);
 
-  const formatDayName = (day: keyof DaysOfWeek): string => {
-    const names: Record<keyof DaysOfWeek, string> = {
-      segunda: 'Segunda-feira',
-      terca: 'Terça-feira',
-      quarta: 'Quarta-feira',
-      quinta: 'Quinta-feira',
-      sexta: 'Sexta-feira',
-      sabado: 'Sábado',
-      domingo: 'Domingo',
-    };
-    return names[day];
-  };
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const getCurrentDayKey = (): keyof DaysOfWeek => {
-    const days: (keyof DaysOfWeek)[] = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
-    return days[new Date().getDay()];
+    return WEEK_DAYS[new Date().getDay()].key;
   };
 
   const loadData = useCallback(async () => {
@@ -52,32 +56,27 @@ const TelaPrincipal = () => {
       setIsLoading(true);
       const today = getCurrentDayKey();
       setCurrentDay(today);
+      setViewDay(today);
 
       const weeklyPlan = await WorkoutService.fetchWeeklyPlan();
-
-      const activeDayKeys = (Object.keys(selectedDays) as Array<keyof DaysOfWeek>).filter(
-        (key) => selectedDays[key]
-      );
+      const activeDayKeys = (Object.keys(selectedDays) as Array<keyof DaysOfWeek>).filter(key => selectedDays[key]);
 
       const builtWorkouts: DayWorkout[] = activeDayKeys.map((key) => {
+        const weekDef = WEEK_DAYS.find(w => w.key === key);
         return {
           day: key,
-          label: formatDayName(key),
+          label: key.charAt(0).toUpperCase() + key.slice(1),
+          shortLabel: weekDef?.short || '',
           exercises: weeklyPlan[key] || [],
           isToday: key === today,
+          dateIndex: WEEK_DAYS.findIndex(w => w.key === key)
         };
       });
 
-      const sortedWorkouts = builtWorkouts.sort((a, b) => {
-        const daysOrder = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
-        return daysOrder.indexOf(a.day) - daysOrder.indexOf(b.day);
-      });
-
-      setWorkouts(sortedWorkouts);
+      setWorkouts(builtWorkouts);
 
       const savedStatus = await StorageService.getItem<Record<string, boolean>>(StorageKeys.PRINCIPAL_COMPLETION);
       const lastResetDate = await StorageService.getItem<string>(StorageKeys.PRINCIPAL_LAST_DATE);
-      
       const todayDateString = new Date().toDateString();
 
       if (lastResetDate !== todayDateString) {
@@ -101,110 +100,79 @@ const TelaPrincipal = () => {
     }, [loadData])
   );
 
-  const handleCompleteWorkout = useCallback(async (day: keyof DaysOfWeek) => {
+  const handleCompleteWorkout = async () => {
+    if (!activeWorkoutModal) return;
+    const day = activeWorkoutModal.day;
+
     if (day !== currentDay) {
-      Alert.alert('Ação não permitida', 'Apenas pode marcar como concluído o treino do dia atual.');
+      Alert.alert('Calma aí, atleta!', 'Você só pode treinar e ganhar XP no dia de hoje.');
       return;
     }
 
-    if (completionStatus[day]) {
-      Alert.alert('Treino concluído', `Já completou o treino de ${day} hoje. Bom trabalho!`);
-      return;
-    }
-
-    if (!user) {
-      Alert.alert('Erro de Sessão', 'Usuário não autenticado. Faça login novamente.');
-      return;
-    }
-
+    if (!user) return;
     const userId = (user as any).id || (user as any).userId;
-
-    if (!userId) {
-      Alert.alert('Erro', 'ID do usuário não encontrado na sessão.');
-      return;
-    }
 
     try {
       setIsFinishing(true);
-      
-      const title = `Treino de ${formatDayName(day)}`;
-      const durationMin = 45; 
+      const durationMin = activeWorkoutModal.exercises.reduce((acc, ex) => acc + (ex.restTime ? Math.ceil(ex.restTime/60) * ex.sets : 5), 0) || 45; 
       const xpAwarded = 150; 
 
-      const data = await WorkoutService.finishWorkoutAPI(userId, title, durationMin, xpAwarded);
+      const data = await WorkoutService.finishWorkoutAPI(userId, `Treino de ${activeWorkoutModal.label}`, durationMin, xpAwarded);
 
       const updatedStatus = { ...completionStatus, [day]: true };
       setCompletionStatus(updatedStatus);
       await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
       
-      if (fetchProgress) {
-        await fetchProgress(userId);
-      }
+      if (fetchProgress) await fetchProgress(userId);
 
-      Alert.alert('Parabéns! 🎉', `Completou o treino com sucesso na nuvem!\n\nGanhou +${xpAwarded} XP\n🔥 Ofensiva: ${data.streak.currentStreak} dia(s)`);
+      setActiveWorkoutModal(null);
+      Alert.alert('Treino Destruído! 🔥', `Excelente trabalho!\n\nGanhou +${xpAwarded} XP\nOfensiva: ${data.streak.currentStreak} dia(s)`);
       
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar o seu progresso na nuvem. Verifique a sua conexão.');
+      Alert.alert('Erro', 'Não foi possível salvar o seu progresso.');
     } finally {
       setIsFinishing(false);
     }
-  }, [currentDay, completionStatus, user, fetchProgress]);
+  };
 
-  const renderWorkoutCard = ({ item }: { item: DayWorkout }) => {
-    const isCompleted = completionStatus[item.day];
-
+  const renderStripCalendar = () => {
     return (
-      <View style={[styles.card, item.isToday && styles.cardToday]}>
-        <View style={styles.cardHeader}>
-          <Text style={[styles.dayTitle, item.isToday && styles.dayTitleToday]}>
-            {item.label}
-          </Text>
-          {item.isToday && (
-            <View style={styles.badgeToday}>
-              <Text style={styles.badgeText}>Hoje</Text>
-            </View>
-          )}
-        </View>
+      <View>
+        <ScrollView 
+          ref={scrollViewRef}
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.calendarContainer}
+        >
+          {WEEK_DAYS.map((d, index) => {
+            const isSelected = viewDay === d.key;
+            const isToday = currentDay === d.key;
+            const hasWorkout = workouts.some(w => w.day === d.key);
 
-        <View style={styles.exercisesContainer}>
-          {item.exercises.map((ex) => (
-            <View key={ex.id} style={styles.exerciseRow}>
-              <FontAwesome5 name="dumbbell" size={14} color={theme.colors.primary} style={{ marginTop: 2 }} />
-              <View style={styles.exerciseTextContainer}>
-                <Text style={styles.exerciseName}>{ex.name}</Text>
-                <Text style={styles.exerciseDetails}>{ex.details}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {item.isToday && (
-          <TouchableOpacity
-            style={[styles.button, isCompleted ? styles.buttonCompleted : styles.buttonActive, isFinishing && { opacity: 0.7 }]}
-            onPress={() => handleCompleteWorkout(item.day)}
-            disabled={isCompleted || isFinishing}
-            activeOpacity={0.8}
-          >
-            {isFinishing ? (
-              <ActivityIndicator color={theme.colors.surface} />
-            ) : (
-              <>
-                <FontAwesome5 
-                  name={isCompleted ? "check-circle" : "play-circle"} 
-                  size={18} 
-                  color={theme.colors.surface} 
-                  style={{ marginRight: 8 }} 
-                />
-                <Text style={styles.buttonText}>
-                  {isCompleted ? 'Treino Concluído' : 'Começar Treino'}
+            return (
+              <TouchableOpacity 
+                key={d.key}
+                style={[styles.dayButton, isSelected && styles.dayButtonActive]}
+                onPress={() => setViewDay(d.key)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.dayTextWeek, isSelected && styles.dayTextActive]}>{d.short}</Text>
+                <Text style={[styles.dayTextDate, isSelected && styles.dayTextActive]}>
+                  {new Date().getDate() - (new Date().getDay() - index)}
                 </Text>
-              </>
-            )}
-          </TouchableOpacity>
-        )}
+                {hasWorkout && (
+                  <View style={[styles.todayIndicator, isSelected && styles.activeTodayIndicator]} />
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
     );
   };
+
+  const selectedWorkout = workouts.find(w => w.day === viewDay);
+  const isCompleted = completionStatus[viewDay];
 
   if (isLoading) {
     return (
@@ -218,24 +186,101 @@ const TelaPrincipal = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Meu Plano</Text>
-        <Text style={styles.subtitle}>Bora treinar hoje?</Text>
+        <Text style={styles.subtitle}>Sua jornada de força começa aqui.</Text>
       </View>
 
-      {workouts.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <FontAwesome5 name="calendar-times" size={48} color={theme.colors.border} />
-          <Text style={styles.emptyText}>Nenhum dia de treino selecionado. Ajuste o seu plano no Perfil.</Text>
+      {renderStripCalendar()}
+
+      <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
+        <Text style={styles.sectionTitle}>
+          {viewDay === currentDay ? 'Treino de Hoje' : `Treino de ${selectedWorkout?.label || 'Descanso'}`}
+        </Text>
+
+        {!selectedWorkout || selectedWorkout.exercises.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <FontAwesome5 name="bed" size={48} color={theme.colors.border} />
+            <Text style={styles.emptyText}>Dia de descanso ou nenhum treino configurado. Aproveite para recuperar os músculos!</Text>
+          </View>
+        ) : (
+          selectedWorkout.exercises.map((ex, index) => (
+            <View key={ex.id || index.toString()} style={styles.richCard}>
+              <View style={styles.richCardHeader}>
+                <View style={styles.muscleTag}>
+                  <Text style={styles.muscleTagText}>{ex.muscleGroup || 'Corpo Inteiro'}</Text>
+                </View>
+                <View style={styles.exerciseMetaContainer}>
+                  <FontAwesome5 name="sync-alt" size={12} color={theme.colors.textBody} />
+                  <Text style={styles.exerciseMetaText}>{ex.sets || 3}x{ex.reps || 12}</Text>
+                  <FontAwesome5 name="clock" size={12} color={theme.colors.textBody} />
+                  <Text style={styles.exerciseMetaText}>{ex.restTime || 60}s</Text>
+                </View>
+              </View>
+
+              <Text style={styles.exerciseName}>{ex.name}</Text>
+              <Text style={styles.exerciseDetails}>{ex.details}</Text>
+              
+            </View>
+          ))
+        )}
+
+        {selectedWorkout && selectedWorkout.exercises.length > 0 && viewDay === currentDay && (
+          <TouchableOpacity 
+            style={[styles.openModalBtn, isCompleted && styles.completedBtn]}
+            onPress={() => !isCompleted && setActiveWorkoutModal(selectedWorkout)}
+            disabled={isCompleted}
+            activeOpacity={0.8}
+          >
+            <FontAwesome5 name={isCompleted ? "check" : "dumbbell"} size={18} color="#FFF" />
+            <Text style={styles.openModalBtnText}>
+              {isCompleted ? 'TREINO CONCLUÍDO' : 'INICIAR SESSÃO'}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+
+      <Modal
+        visible={activeWorkoutModal !== null}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setActiveWorkoutModal(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.bottomSheet}>
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Visão Geral do Treino</Text>
+              <TouchableOpacity onPress={() => setActiveWorkoutModal(null)} style={styles.closeBtn}>
+                <FontAwesome5 name="times" size={20} color={theme.colors.textBody} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {activeWorkoutModal?.exercises.map((ex, idx) => (
+                <View key={idx} style={styles.sheetExerciseRow}>
+                  <FontAwesome5 name="dumbbell" size={20} color={theme.colors.primary} />
+                  <View style={styles.sheetExerciseInfo}>
+                    <Text style={styles.sheetExerciseName}>{ex.name}</Text>
+                    <Text style={styles.sheetExerciseReps}>
+                      {ex.sets || 3} séries de {ex.reps || 12} repetições
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={styles.hugeStartBtn}
+              onPress={handleCompleteWorkout}
+              disabled={isFinishing}
+            >
+              {isFinishing ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.hugeStartBtnText}>COMEÇAR A SUAR</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
-      ) : (
-        <FlatList
-          style={styles.list}
-          data={workouts}
-          keyExtractor={(item) => item.day}
-          renderItem={renderWorkoutCard}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+      </Modal>
     </View>
   );
 };
