@@ -8,6 +8,11 @@ export interface Exercise {
   name: string;
   details: string;
   dayOfWeek?: string;
+  muscleGroup: string;
+  sets: number;
+  reps: string;
+  restTime: number;
+  imageUrl?: string | null;
 }
 
 export interface DailyMission {
