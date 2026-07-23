@@ -1,19 +1,8 @@
 import NetInfo from '@react-native-community/netinfo';
 import { DaysOfWeek } from '../types';
 import { api } from './api';
+import { Exercise } from '../types';
 import { StorageService, StorageKeys } from '../storage/StorageService';
-
-export interface Exercise {
-  id: string;
-  name: string;
-  details: string;
-  dayOfWeek?: string;
-  muscleGroup: string;
-  sets: number;
-  reps: string;
-  restTime: number;
-  imageUrl?: string | null;
-}
 
 export interface DailyMission {
   id: string;
