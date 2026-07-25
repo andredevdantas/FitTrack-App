@@ -1,7 +1,7 @@
 import React, { useState, useContext, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Modal } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { WorkoutService } from '../services/WorkoutService';
 import { UserContext } from '../contexts/UserContext'; 
 import { DaysContext } from '../contexts/DaysContext';
@@ -34,6 +34,7 @@ const TelaPrincipal = () => {
   const { theme } = useContext(ThemeContext);
   const { user, fetchProgress } = useContext(UserContext);
   const styles = getStyles(theme);
+  const navigation = useNavigation<any>();
 
   const [workouts, setWorkouts] = useState<DayWorkout[]>([]);
   const [currentDay, setCurrentDay] = useState<keyof DaysOfWeek>('segunda');
@@ -269,14 +270,13 @@ const TelaPrincipal = () => {
 
             <TouchableOpacity 
               style={styles.hugeStartBtn}
-              onPress={handleCompleteWorkout}
-              disabled={isFinishing}
+              activeOpacity={0.8}
+              onPress={() => {
+                setActiveWorkoutModal(null);
+                navigation.navigate('TreinoAtivo');
+              }}
             >
-              {isFinishing ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={styles.hugeStartBtnText}>COMEÇAR A SUAR</Text>
-              )}
+              <Text style={styles.hugeStartBtnText}>Começar o Exercicio</Text>
             </TouchableOpacity>
           </View>
         </View>
