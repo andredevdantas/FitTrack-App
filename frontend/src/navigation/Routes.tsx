@@ -8,6 +8,7 @@ import { RootStackParamList } from '../types';
 import telaLogin from '../screens/telaLogin';
 import TelaVerificacao from '../screens/telaVerificacao';
 import TabNavigator from './TabNavigator';
+import TelaTreinoAtivo from '../screens/telaTreinoAtivo';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -40,6 +41,7 @@ export function Routes() {
         <Stack.Screen name="Login" component={telaLogin} />
         <Stack.Screen name="Verificacao" component={TelaVerificacao} />
         <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen name="TreinoAtivo" component={TelaTreinoAtivo} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -53,6 +53,7 @@ export type RootStackParamList = {
   Login: undefined;
   Verificacao: { email: string };
   MainTabs: undefined;
+  TreinoAtivo: undefined;
 };
 
 export type MainTabParamList = {
