@@ -32,7 +32,7 @@ const WEEK_DAYS: { key: keyof DaysOfWeek, short: string }[] = [
 const TelaPrincipal = () => {
   const { selectedDays } = useContext(DaysContext);
   const { theme } = useContext(ThemeContext);
-  const { user, fetchProgress } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const styles = getStyles(theme);
   const navigation = useNavigation<any>();
 
@@ -42,7 +42,6 @@ const TelaPrincipal = () => {
   
   const [completionStatus, setCompletionStatus] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isFinishing, setIsFinishing] = useState<boolean>(false);
   
   const [activeWorkoutModal, setActiveWorkoutModal] = useState<DayWorkout | null>(null);
 
@@ -100,41 +99,6 @@ const TelaPrincipal = () => {
       loadData();
     }, [loadData])
   );
-
-  const handleCompleteWorkout = async () => {
-    if (!activeWorkoutModal) return;
-    const day = activeWorkoutModal.day;
-
-    if (day !== currentDay) {
-      Alert.alert('Calma aí, atleta!', 'Você só pode treinar e ganhar XP no dia de hoje.');
-      return;
-    }
-
-    if (!user) return;
-    const userId = (user as any).id || (user as any).userId;
-
-    try {
-      setIsFinishing(true);
-      const durationMin = activeWorkoutModal.exercises.reduce((acc, ex) => acc + (ex.restTime ? Math.ceil(ex.restTime/60) * ex.sets : 5), 0) || 45; 
-      const xpAwarded = 150; 
-
-      const data = await WorkoutService.finishWorkoutAPI(userId, `Treino de ${activeWorkoutModal.label}`, durationMin, xpAwarded);
-
-      const updatedStatus = { ...completionStatus, [day]: true };
-      setCompletionStatus(updatedStatus);
-      await StorageService.setItem(StorageKeys.PRINCIPAL_COMPLETION, updatedStatus);
-      
-      if (fetchProgress) await fetchProgress(userId);
-
-      setActiveWorkoutModal(null);
-      Alert.alert('Treino Destruído! 🔥', `Excelente trabalho!\n\nGanhou +${xpAwarded} XP\nOfensiva: ${data.streak.currentStreak} dia(s)`);
-      
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar o seu progresso.');
-    } finally {
-      setIsFinishing(false);
-    }
-  };
 
   const renderStripCalendar = () => {
     return (
@@ -272,11 +236,12 @@ const TelaPrincipal = () => {
               style={styles.hugeStartBtn}
               activeOpacity={0.8}
               onPress={() => {
+                const workoutToSend = activeWorkoutModal;
                 setActiveWorkoutModal(null);
-                navigation.navigate('TreinoAtivo');
+                navigation.navigate('TreinoAtivo', { workout: workoutToSend }); 
               }}
             >
-              <Text style={styles.hugeStartBtnText}>Começar o Exercicio</Text>
+              <Text style={styles.hugeStartBtnText}>COMEÇAR A SUAR</Text>
             </TouchableOpacity>
           </View>
         </View>
