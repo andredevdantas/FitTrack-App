@@ -10,9 +10,11 @@ export interface User {
   name: string;
   email: string;
   xp: number;
+  level?: number;
   totalWorkouts: number;
   totalMissions: number;
   streak?: Streak;
+  weeklyXp?: number[];
 }
 
 export interface Mission {
