@@ -49,18 +49,25 @@ const TelaPerfil = () => {
     workouts: 0,
     streak: 0,
     level: 1,
+    weeklyXp: [0, 0, 0, 0, 0, 0, 0],
   });
 
   const loadData = async () => {
     try {
       const localStreak = await StreakService.getStreak();
+      const currentXp = user?.xp || 0;
       
+      const calculatedLevel = user?.level || Math.floor(currentXp / 500) + 1;
+      
+      const chartData = user?.weeklyXp?.length === 7 ? user.weeklyXp : [0, 0, 0, currentXp > 0 ? 150 : 0, 0, 0, 0];
+
       setUserStats({ 
-        xp: (user as any)?.xp || 0, 
-        missions: (user as any)?.totalMissions || 0, 
-        workouts: (user as any)?.totalWorkouts || 0, 
-        streak: (user as any)?.streak?.currentStreak ?? localStreak,
-        level: (user as any)?.level || 1,
+        xp: currentXp, 
+        missions: user?.totalMissions || 0, 
+        workouts: user?.totalWorkouts || 0, 
+        streak: user?.streak?.currentStreak ?? localStreak,
+        level: calculatedLevel,
+        weeklyXp: chartData
       });
 
       const savedImage = await StorageService.getItem<string>(StorageKeys.USER_PROFILE_IMAGE);
@@ -126,7 +133,7 @@ const TelaPerfil = () => {
     labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
     datasets: [
       {
-        data: [150, 300, 0, 450, 150, 0, 600]
+        data: userStats.weeklyXp
       }
     ]
   };
@@ -144,6 +151,8 @@ const TelaPerfil = () => {
       strokeDasharray: "4",
     },
   };
+
+  const progressPercentage = (userStats.xp % 500) / 500 * 100;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -176,13 +185,13 @@ const TelaPerfil = () => {
           </View>
         </TouchableOpacity>
         
-        <Text style={styles.userName}>{(user as any)?.name || 'Atleta FitTrack'}</Text>
-        <Text style={styles.userEmail}>{(user as any)?.email || 'email@fittrack.app'}</Text>
+        <Text style={styles.userName}>{user?.name || 'Atleta FitTrack'}</Text>
+        <Text style={styles.userEmail}>{user?.email || 'email@fittrack.app'}</Text>
     
         <View style={styles.levelContainer}>
           <Text style={styles.levelText}>Nível {userStats.level}</Text>
           <View style={styles.progressBarBackground}>
-            <View style={[styles.progressBarFill, { width: `${(userStats.xp % 500) / 500 * 100}%` }]} />
+            <View style={[styles.progressBarFill, { width: `${progressPercentage}%` }]} />
           </View>
         </View>
 
@@ -190,13 +199,13 @@ const TelaPerfil = () => {
           flexDirection: 'row',
           alignItems: 'center',
           backgroundColor: `${theme.colors.warning}20`,
-          paddingHorizontal: 12,
-          paddingVertical: 6,
-          borderRadius: 16,
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+          borderRadius: 20,
           marginTop: 12,
         }}>
-          <Text style={{ fontSize: 14, fontWeight: 'bold', color: theme.colors.warning }}>
-            {userStats.streak} {userStats.streak === 1 ? 'dia' : 'dias'} de ofensiva
+          <Text style={{ fontSize: 16, fontWeight: 'bold', color: theme.colors.warning }}>
+            🔥 {userStats.streak} {userStats.streak === 1 ? 'dia' : 'dias'} de ofensiva
           </Text>
         </View>
 
