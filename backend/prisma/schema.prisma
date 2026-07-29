@@ -22,9 +22,18 @@ model User {
   // Relacionamentos
   workouts         Workout[]
   streak           Streak?
+  activeSession    ActiveSession?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ActiveSession {
+  id        String   @id @default(uuid())
+  startTime DateTime @default(now())
+  
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Workout {
@@ -55,10 +64,10 @@ model Exercise {
   name        String
   details     String
   dayOfWeek   String
-  muscleGroup String   @default("Corpo Inteiro") // Peito, Costas, Pernas
-  sets        Int      @default(3)               // Quantidade de séries
+  muscleGroup String   @default("Corpo Inteiro") 
+  sets        Int      @default(3)               
   reps        String   @default("10 a 12")
-  restTime    Int      @default(60)              // Tempo de descanso em segundos
+  restTime    Int      @default(60)              
   imageUrl    String?
 
   createdAt   DateTime @default(now())
