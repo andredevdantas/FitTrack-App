@@ -5,6 +5,7 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 const router = Router();
 const workoutController = new WorkoutController();
 
+router.post('/:userId/start', authMiddleware, workoutController.startWorkout);
 router.post('/:userId/finish', authMiddleware, workoutController.finishWorkout);
 
 export default router;
