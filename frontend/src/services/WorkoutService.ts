@@ -24,8 +24,6 @@ export interface QueuedWorkout {
   id: string;
   userId: string;
   title: string;
-  durationMin: number;
-  xpAwarded: number;
   isMission: boolean;
 }
 
@@ -56,7 +54,6 @@ export const WorkoutService = {
     try {
       const response = await api.get('/catalog/missions');
       const missions: DailyMission[] = response.data;
-      
       const shuffled = [...missions].sort(() => 0.5 - Math.random());
       return shuffled.slice(0, 5);
     } catch (error) {
@@ -75,7 +72,21 @@ export const WorkoutService = {
     }
   },
 
-  async finishWorkoutAPI(userId: string, title: string, durationMin: number, xpAwarded: number, isMission: boolean = false) {
+  async startWorkoutAPI(userId: string) {
+    try {
+      const networkState = await NetInfo.fetch();
+      if (!networkState.isConnected) {
+        console.log('Modo Offline: Não foi possível iniciar sessão no servidor.');
+        return;
+      }
+      await api.post(`/workouts/${userId}/start`);
+      console.log('Sessão de treino iniciada no servidor.');
+    } catch (error) {
+      console.error('Erro ao iniciar treino no servidor:', error);
+    }
+  },
+
+  async finishWorkoutAPI(userId: string, title: string, isMission: boolean = false) {
     try {
       const networkState = await NetInfo.fetch();
       if (!networkState.isConnected) {
@@ -84,20 +95,15 @@ export const WorkoutService = {
         
         const newOfflineItem: QueuedWorkout = {
           id: Math.random().toString(36).substr(2, 9),
-          userId, title, durationMin, xpAwarded, isMission
+          userId, title, isMission
         };
         
         await StorageService.setItem(StorageKeys.OFFLINE_QUEUE, [...queue, newOfflineItem]);
-        return {
-          streak: { currentStreak: 'Sincronizando...' },
-          offline: true
-        };
+        return { offline: true, workout: { xpAwarded: 150 }, realDurationMin: 'Offline' };
       }
 
       const response = await api.post(`/workouts/${userId}/finish`, {
         title,
-        durationMin,
-        xpAwarded,
         isMission
       });
       return response.data; 
@@ -121,8 +127,6 @@ export const WorkoutService = {
       try {
         await api.post(`/workouts/${item.userId}/finish`, {
           title: item.title,
-          durationMin: item.durationMin,
-          xpAwarded: item.xpAwarded,
           isMission: item.isMission
         });
         console.log(`[SyncService] Sincronizado com sucesso: ${item.title}`);
