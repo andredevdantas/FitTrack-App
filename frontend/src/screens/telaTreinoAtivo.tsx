@@ -29,7 +29,7 @@ const MOCK_WORKOUT = [
   }
 ];
 
-const ANTI_CHEAT_MINIMUM_SECONDS = 10; 
+const UI_MINIMUM_SECONDS = 20; 
 
 const TelaTreinoAtivo = () => {
   const { theme } = useContext(ThemeContext);
@@ -49,14 +49,19 @@ const TelaTreinoAtivo = () => {
   
   const currentExercise = exercises[currentIndex];
   const isLastExercise = currentIndex === exercises.length - 1;
-  const canFinishWorkout = secondsElapsed >= ANTI_CHEAT_MINIMUM_SECONDS;
+  const canFinishWorkout = secondsElapsed >= UI_MINIMUM_SECONDS;
 
   useEffect(() => {
+    if (user) {
+      const userId = (user as any).id || (user as any).userId;
+      WorkoutService.startWorkoutAPI(userId);
+    }
+
     const timer = setInterval(() => {
       setSecondsElapsed(prev => prev + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [user]);
 
   const formatTime = (totalSeconds: number) => {
     const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -65,9 +70,7 @@ const TelaTreinoAtivo = () => {
   };
 
   const handleNextExercise = () => {
-    if (!isLastExercise) {
-      setCurrentIndex(prev => prev + 1);
-    }
+    if (!isLastExercise) setCurrentIndex(prev => prev + 1);
   };
 
   const handleFinishWorkout = async () => {
@@ -83,10 +86,7 @@ const TelaTreinoAtivo = () => {
     try {
       setIsFinishing(true);
       
-      const durationMin = Math.max(1, Math.ceil(secondsElapsed / 60)); 
-      const xpAwarded = 150; 
-
-      const data = await WorkoutService.finishWorkoutAPI(userId, `Treino de ${workoutLabel}`, durationMin, xpAwarded);
+      const data = await WorkoutService.finishWorkoutAPI(userId, `Treino de ${workoutLabel}`, false);
 
       if (activeWorkout?.day) {
         const savedStatus = await StorageService.getItem<Record<string, boolean>>(StorageKeys.PRINCIPAL_COMPLETION) || {};
@@ -96,12 +96,19 @@ const TelaTreinoAtivo = () => {
       
       if (fetchProgress) await fetchProgress(userId);
 
-      Alert.alert('Treino Destruído! 🔥', `Excelente trabalho!\n\nTempo: ${formatTime(secondsElapsed)}\nGanhou +${xpAwarded} XP\nOfensiva: ${data.streak.currentStreak} dia(s)`, [
-        { text: "Incrível", onPress: () => navigation.goBack() }
-      ]);
+      const xpGanho = data.workout?.xpAwarded || '???';
+      const tempoValidado = data.realDurationMin || 0;
+      const textoLevelUp = data.leveledUp ? `\n🎉 SUBIU PARA O NÍVEL ${data.newLevel}!` : '';
+
+      Alert.alert(
+        'Treino Destruído! 🔥', 
+        `Excelente trabalho!\n\nTempo computado: ${tempoValidado} min\nGanhou +${xpGanho} XP${textoLevelUp}`, 
+        [{ text: "Incrível", onPress: () => navigation.goBack() }]
+      );
       
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar o seu progresso no servidor.');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Não foi possível salvar o seu progresso no servidor.';
+      Alert.alert('Atenção', errorMessage);
     } finally {
       setIsFinishing(false);
     }
@@ -193,7 +200,7 @@ const TelaTreinoAtivo = () => {
             </TouchableOpacity>
             {!canFinishWorkout && (
               <Text style={styles.antiCheatText}>
-                O botão será liberado em {ANTI_CHEAT_MINIMUM_SECONDS - secondsElapsed}s (Anti-Cheat)
+                O botão será liberado em {UI_MINIMUM_SECONDS - secondsElapsed}s (Anti-Cheat)
               </Text>
             )}
           </View>
